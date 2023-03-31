@@ -1,0 +1,67 @@
+﻿@inherits LayoutComponentBase
+
+@inject NavigationManager manager
+@inject SingletonServise servise
+
+<PageTitle>YusupovHotel</PageTitle>
+
+<div class="page" >
+    <div class="sidebar" id="nav-bar-id" >
+            <NavMenu />
+        </div>
+        <main>
+        <div class="top-row px-4" id="header">
+            @if (servise.user != null)
+            {
+                    <div class="dropdown">
+                    <a style="text-decoration: none; color: white" class="dropdown-toggle" href="" id="dropdownMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                @servise.user.FullName
+                          </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu">
+                        <li>
+                            <a class="dropdown-item" href="employeeProfile"><i class="fas fa-vcard prefix grey-text"></i>     Профиль</a>
+                            </li>
+                        <li>
+                            <a class="dropdown-item" href="#" @onclick="() => LogOut()" ><i class="fas fa-sign-out prefix grey-text"></i>     Выйти</a>
+                            </li>
+                          </ul>
+                        </div>
+            }
+            </div>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+</div>
+
+@{
+    void LogOut()
+    {
+        servise.user = null;
+        servise.room = null;
+        servise.client = null;
+        manager.NavigateTo("/");
+    }
+}
+
+
+<style>
+    #nav-bar-id {
+        width: 230px;
+        background: #394a59;
+        z-index: 1001;
+        box-shadow: 0 0 20px rgb(10 7 16 / 50%);
+    }
+
+    #header, #logo {
+        background: #1a2732;
+        z-index: 1002;
+        height: 60px;
+        border: 0;
+        border-bottom: 1px solid #d6d5d5;
+    }
+
+    .dropdown-item {
+        margin-left: 0 !important;
+    }
+</style>

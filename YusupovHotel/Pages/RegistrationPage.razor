@@ -1,0 +1,233 @@
+﻿@page "/registration"
+
+<PageTitle>Registration</PageTitle>
+
+@using System.Text.RegularExpressions;
+@inject IJSRuntime js
+@inject NavigationManager manager
+@inject SingletonServise servise
+
+<section class="vh-100 bg-image">
+    <div class="backgroundRegistr">
+        <div class="shapeReg"></div>
+        <div class="shapeReg"></div>
+    </div>
+    <EditForm Model="@user" class="formRegistr" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <h3 style="margin-top: -35px; margin-bottom: -10px;">Login Here</h3>
+
+        <label for="username">Фамлия, имя, отчество</label>
+        <InputText class="textblocks" id="username" style="border-color: black" type="text" @bind-Value="user.FullName"></InputText>
+
+        <label for="username">Почтовый адрес</label>
+        <InputText class="textblocks" id="username" style="border-color: black" type="email" @bind-Value="user.Email" ></InputText>
+        <ValidationMessage For="() => user.Email" />
+
+
+        <label for="username">Номер телефона</label>
+        <InputMask style="border-color: black"  @bind-Value="user.PhoneNumber"  data-mask="+7(000)-000-00-00" placeholder="+7(" />
+        <ValidationMessage For="() => user.PhoneNumber" />
+
+        <label for="password">Пароль</label>
+        <InputText class="textblocks" id="password" style="border-color: black" type="password" @bind-Value="user.Password"></InputText>
+        <ValidationMessage For="() => user.Password" />
+
+        <label for="password">Повтор пароля</label>
+        <InputText style="border-color: black" id="password" type="password" @bind-Value="user.ConfirmPassword"></InputText>
+        <ValidationMessage For="() => user.ConfirmPassword"/>
+
+        <button type="button">Зарегистрировать</button>
+    </EditForm>
+</section>
+
+@code {
+    bool Error = false;
+    string ErrorText = "Такой почтовый адресс уже есть!";
+    bool wasSubmitted;
+    User user = new User("", "", "", "","");
+
+    protected override void OnInitialized()
+    {
+        js.InvokeVoidAsync("ChangePanelsState");
+    }
+
+    private void CheckEmail()
+    {
+        if (Mongo.FindUser(user.Email) != null)
+        {
+            Error = true;
+        }
+        else
+        {
+            Error = false;
+        }
+    }
+
+    private void RegistrClick()
+    {
+
+
+
+        //if(Password != RepeatPassword)
+        //{
+        //    Error = true;
+        //    ErrorText = "Пароль не сходится";
+        //    return;
+        //}
+        //else
+        //{
+        //    Error = false;
+        //}
+        //if (FullName != "" && (PhoneNumber != "" && PhoneNumber.Length == 11) && Email != "" && Password != "" && RepeatPassword != "")
+        //{
+        //    User user = new User(FullName, PhoneNumber, Email, Password);
+        //    Mongo.AddUserToDB(user);
+        //    manager.NavigateTo("authorization");
+        //}
+        //else
+        //{
+        //    Error = true;
+        //    ErrorText = "Заполните все данные!";
+        //    return;
+        //}
+
+    }
+    public void Submit()
+    {
+        wasSubmitted = true;
+        RegistrClick();
+    }
+}
+
+<style>
+
+    .vh-100 {
+    height: 97vh!important;
+}
+    *,
+    *:before,
+    *:after {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: black;
+    }
+
+    .backgroundRegistr {
+        width: 430px;
+        height: 520px;
+        position: absolute;
+        transform: translate(-50%,-50%);
+        left: 47%;
+        top: 50%;
+    }
+
+    .backgroundRegistr .shapeReg {
+        height: 200px;
+        width: 200px;
+        position: absolute;
+        border-radius: 50%;
+    }
+
+    .shapeReg:first-child {
+        background: linear-gradient( #1845ad, #23a2f6 );
+        left: -80px;
+        top: -160px;
+    }
+
+    .shapeReg:last-child {
+        background: linear-gradient( to right, #ff512f, #f09819 );
+        right: -64px;
+        bottom: -160px;
+    }
+
+    .formRegistr {
+        width: 410px;
+        background-color: rgba(255,255,255,0.13);
+        position: absolute;
+        transform: translate(-50%,-50%);
+        top: 50%;
+        left: 47%;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 40px rgba(8,7,16,0.6);
+        padding: 50px 35px;
+    }
+
+    form * {
+        font-family: 'Poppins',sans-serif;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+        outline: none;
+        border: none;
+    }
+
+    form h3 {
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 42px;
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin-top: 25px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    input::placeholder {
+        color: darkgrey;
+    }
+
+    input {
+        display: block;
+        height: 40px;
+        width: 100%;
+        background-color: rgba(255,255,255,0.07);
+        border-radius: 3px;
+        padding: 0 10px;
+        margin-top: 8px;
+        font-size: 14px;
+        font-weight: 300;
+    }
+
+    ::placeholder {
+        color: #e5e5e5;
+    }
+
+    button {
+        margin-top: 30px;
+        width: 100%;
+        background-color: #ffffff;
+        color: #080710;
+        padding: 15px 0;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .social {
+        display: flex;
+        margin-left: 25px;
+    }
+
+        .social div {
+            background: red;
+            width: 150px;
+            border-radius: 3px;
+            padding: 5px 10px 10px 5px;
+            background-color: rgba(255,255,255,0.27);
+            color: #eaf0fb;
+            text-align: center;
+        }
+
+            .social div:hover {
+                background-color: rgba(255,255,255,0.47);
+            }
+</style>

@@ -1,0 +1,85 @@
+﻿@page "/clientProfile"
+
+<PageTitle>Profile</PageTitle>
+@inject IJSRuntime js
+@inject NavigationManager manager
+@inject SingletonServise servise
+
+<section style="background-color: #eee;">
+    <div class="row">
+        <div class="col-lg-4" style="height: 350px">
+            <div class="card mb-4">
+                <div class="card-body text-center" style="height: 330px">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
+                         class="rounded-circle img-fluid" style="width: 200px;">
+                    <div class="d-flex justify-content-center mb-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Full name</p>
+                            </div>
+                            <div class="col-sm-9">
+                            <p class="text-muted mb-0"> @client.ClientName </p>
+                            </div>
+                        </div>
+                        <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Email</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">@client.Email</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Phone number</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">@client.PhoneNumber</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center" id="btnProfil">
+                <button type="button"
+                        class="btn btn-success" @onclick=Editing>
+                    Editing
+                </button>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+@code {
+    private Client client;
+    protected override void OnInitialized()
+    {
+        js.InvokeVoidAsync("ChangePanelsState");
+        client = servise.client;
+    }
+
+    private void Loaded()
+    {
+        
+    }
+
+    private void LogOut()
+    {
+        //servise.SetUser(null);
+        //manager.NavigateTo("authorization");
+    }
+
+    private void Editing()
+    {
+        manager.NavigateTo("editing");
+    }
+}
