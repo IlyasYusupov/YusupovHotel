@@ -1,114 +1,56 @@
-﻿@*@page "/employeeProfile"
+﻿@page "/employeeProfile"
 
 <PageTitle>Profile</PageTitle>
 
 @inject NavigationManager manager
 @inject SingletonServise servise
 
-<EditForm Model="@userModel" >
-    <DataAnnotationsValidator />
-
-    <label for="name">Логин</label>
-    <InputText class="textblocks" id="name" type="email" @bind-Value="userModel.Email"></InputText>
-    <ValidationMessage For="() => userModel.Email" />
-
-    <label for="password">Пароль</label>
-    <InputText  id="password" type="password" @bind-Value="userModel.Password"></InputText>
-    <ValidationMessage For="() => userModel.Password"/>
-</EditForm>
+<input type="text" name="search" placeholder="Search..">
 
 
-
-@code {
-private string phoneNumber = string.Empty;
-    private string email = string.Empty;
-    private string adress = string.Empty;
-    private string inn = string.Empty;
-    private string kpp = string.Empty;
-    private string ogrn = string.Empty;
-    private string organization = string.Empty;
-
-    private string stringPath = string.Empty;
-    private string fileName = string.Empty;
-    private string photoPath = string.Empty;
-
-    private int maxAllowedFiles = 1;
-    IReadOnlyList<IBrowserFile> selectedFiles;
-
-    protected override void OnInitialized()
-    {
-        if(singleton.user._idPhoto != new ObjectId())
-        {
-            PhotoSystemService.DownloadToLocal(env.WebRootPath, singleton.user);
-            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
-        }
-    }
-
-    private void BtnOutput()
-    {
-        singleton.LogIn = false;
-        NavigationManager.NavigateTo("/");
-    }
-
-    private async Task BtnSave()
-    {
-        if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true && ErrorParseInt(inn, 10)
-            && ErrorParseInt(kpp, 9) && ErrorParseInt(ogrn, 13) && organization.Length >= 10 && adress.Length >= 10)
-        {
-            clickRef = !clickRef;
-            singleton.user.TopUp(email, phoneNumber, ogrn, inn, kpp, adress, organization);
-            await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
-            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
-            wasSubmitted = true;
-            MongoExamples.ReplaceById(singleton.user._id, singleton.user);
-        }
-        else if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true 
-        && singleton.user.Department == "Customer")
-        {
-            clickRef = !clickRef;
-            singleton.user.TopUp(email, phoneNumber);
-            await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
-            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
-            wasSubmitted = true;
-            MongoExamples.ReplaceById(singleton.user._id, singleton.user);
-        }
-    }
-
-    private void OnInputFileChange(InputFileChangeEventArgs e)
-    {
-        selectedFiles = e.GetMultipleFiles();
-        OnSubmit();
-    }
-
-    private async void OnSubmit()
-    {
-        foreach (var file in selectedFiles)
-        {
-            Stream stream = file.OpenReadStream(10000000000);
-            stringPath = $"{env.WebRootPath}\\Images\\{file.Name}";
-            fileName = file.Name;
-            FileStream fs = File.Create(stringPath);
-            await stream.CopyToAsync(fs);
-            stream.Close();
-            fs.Close();
-        }
-    }
-
-    bool wasSubmitted;
-    bool clickRef;
-
-    private void clickRefBtn()
-    {
-        wasSubmitted = false;
-        clickRef = !clickRef;
-    }
-
-    private void Submit()
-    {
-        wasSubmitted = true;
-    }
-
-
+<style>
+.button {
+display: inline-block;
+    border-radius: 4px;
+    background-color: #0dcaf0;
+    border: none;
+    color: #253a4c;
+    text-align: center;
+    font-size: 16px;
+    padding: 11px;
+    width: 116px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
 }
 
-*@
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -30px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 22px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+</style>
+
+
+<h2>Animated Button</h2>
+
+<button class="button" style="vertical-align:middle"><span>Изменить </span></button>

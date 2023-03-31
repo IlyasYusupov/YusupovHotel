@@ -18,6 +18,7 @@
 
         <label for="username">Фамлия, имя, отчество</label>
         <InputText class="textblocks" id="username" style="border-color: black" type="text" @bind-Value="user.FullName"></InputText>
+        <ValidationMessage For="() => user.FullName" />
 
         <label for="username">Почтовый адрес</label>
         <InputText class="textblocks" id="username" style="border-color: black" type="email" @bind-Value="user.Email" ></InputText>
@@ -36,61 +37,26 @@
         <InputText style="border-color: black" id="password" type="password" @bind-Value="user.ConfirmPassword"></InputText>
         <ValidationMessage For="() => user.ConfirmPassword"/>
 
-        <button type="button">Зарегистрировать</button>
+        <button type="submit">Зарегистрировать</button>
     </EditForm>
 </section>
 
 @code {
-    bool Error = false;
-    string ErrorText = "Такой почтовый адресс уже есть!";
     bool wasSubmitted;
     User user = new User("", "", "", "","");
 
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
-        js.InvokeVoidAsync("ChangePanelsState");
-    }
-
-    private void CheckEmail()
-    {
-        if (Mongo.FindUser(user.Email) != null)
+        if (firstRender)
         {
-            Error = true;
-        }
-        else
-        {
-            Error = false;
+            js.InvokeVoidAsync("ChangePanelsState");
         }
     }
 
     private void RegistrClick()
     {
-
-
-
-        //if(Password != RepeatPassword)
-        //{
-        //    Error = true;
-        //    ErrorText = "Пароль не сходится";
-        //    return;
-        //}
-        //else
-        //{
-        //    Error = false;
-        //}
-        //if (FullName != "" && (PhoneNumber != "" && PhoneNumber.Length == 11) && Email != "" && Password != "" && RepeatPassword != "")
-        //{
-        //    User user = new User(FullName, PhoneNumber, Email, Password);
-        //    Mongo.AddUserToDB(user);
-        //    manager.NavigateTo("authorization");
-        //}
-        //else
-        //{
-        //    Error = true;
-        //    ErrorText = "Заполните все данные!";
-        //    return;
-        //}
-
+        Mongo.AddUserToDB(user);
+        manager.NavigateTo("/");
     }
     public void Submit()
     {

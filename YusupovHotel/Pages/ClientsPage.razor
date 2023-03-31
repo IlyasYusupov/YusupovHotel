@@ -64,12 +64,12 @@
         <tbody>
         @foreach (var client in sortingClients)
             {
-                <tr>
+                <tr >
                     <td>@client.ClientName</td>
                     <td>@client.Email</td>
                     <td>@client.PhoneNumber</td>
                     <td>
-                        <button type="button" class="btn btn-info" @onclick="() => OpenCurentClient(client)">Profile</button>
+                        <button class="button" style="vertical-align:middle" @onclick="() => OpenCurentClient(client)"><span>Изменить </span></button>
                     </td>
                 </tr>
             }
@@ -141,16 +141,19 @@
     }
 
     #newClient {
-        margin-left: 50%;
+        position: absolute;
+        margin-left: 70%;
     }
 
-    #searching{
+    #searching { 
         width: 250px;
         height: 35px;
+        padding-left: 24px;
     }
 
     #searching ~ i {
-        margin-left: -26px;
+        width: 35px;
+        margin-left: -272px;
     }
 
     #inputBox {
@@ -205,6 +208,47 @@
         transition: color .2s;
         font-size: 1.75rem;
     }
+
+    .button {
+display: inline-block;
+    border-radius: 4px;
+    background-color: #0dcaf0;
+    border: none;
+    color: black;
+    text-align: center;
+    font-size: 16px;
+    padding: 11px;
+    width: 116px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -30px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 22px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
 </style>
 
 

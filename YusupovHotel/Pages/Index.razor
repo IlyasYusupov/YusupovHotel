@@ -8,15 +8,12 @@
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    <EditForm Model="@user" OnValidSubmit="@Submit">
-    <DataAnnotationsValidator />
+    <form>
         <h3>Login Here</h3>
             <label for="username">Почтовый адрес</label>
-             <InputText class="textblocks" id="username" style="border-color: black" type="email" @bind-Value="user.Email"></InputText>
-            <ValidationMessage For="() => user.Email" />
+             <input class="textblocks" id="username" style="border-color: black" type="email" @bind-value="Email"></input>
             <label for="password">Пароль</label>
-            <InputText style="border-color: black" id="password" type="password" @bind-Value="user.Password"></InputText>
-            <ValidationMessage For="() => user.Password"/>
+            <input style="border-color: black" id="password" type="password" @bind-value="Password"></input>
             @if (Error)
             {
             <br>
@@ -30,13 +27,15 @@
                 Нет аккаунта, <a href="registration">зарегистрируйтесь!</a>
             </label>
         </div>
-            </EditForm>
+            </form>
 </section>
 
 @code {
+    string Email = string.Empty;
+    string Password = string.Empty;
     bool Error = false;
     bool wasSubmitted;
-    User user = new("","","","","");
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -47,9 +46,9 @@
 
     private void SignIn()
     {
-        if (Mongo.FindUser(user.Email) != null && Mongo.FindUser(user.Email).Password == user.Password)
+        if (Mongo.FindUser(Email) != null && Mongo.FindUser(Email).Password ==Password)
         {
-            servise.user = Mongo.FindUser(user.Email);
+            servise.user = Mongo.FindUser(Email);
             manager.NavigateTo("clients");
         }
         else
@@ -61,11 +60,6 @@
     {
         manager.NavigateTo("registration");
 
-    }
-    public void Submit()
-    {
-        wasSubmitted = true;
-        SignIn();
     }
 }
 
