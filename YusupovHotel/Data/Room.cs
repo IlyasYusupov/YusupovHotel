@@ -32,5 +32,7 @@ namespace YusupovHotel.Data
 
         public string Description { get; set; }
 
+        List<string> images = new List<string>();
+
     }
 }

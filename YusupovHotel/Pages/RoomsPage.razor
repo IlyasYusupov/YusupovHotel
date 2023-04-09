@@ -5,45 +5,23 @@
 @inject NavigationManager manager
 @inject SingletonServise servise
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Номер</th>
-            <th>Тип</th>
-            <th>Количесвто мест</th>
-            <th>Площадь</th>
-            <th>Цена за 1 ночь</th>
-            <th>Подробнее</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var room in sortingRooms)
-        {
-            <tr>
-                <td>@room.Number</td>
-                <td>@room.Type</td>
-                <td>@room.Capacity</td>
-                <td>@room.Area</td>
-                <td>@room.Cost</td>
-                <td>
-                    <button type="button" class="btn btn-info" @onclick="() => OpenCurentClient(room)">Подробнее</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<section>
+    @foreach(var room in rooms)
+    {
+        <div>
+            
+        </div>
+    }
+</section>
+
+
 @code
 {
     List<Room> rooms = new List<Room>();
-    List<Room> sortingRooms = new List<Room>();
-    string ClientName = "";
-    string Email = "";
-    string PhoneNumber = "";
 
     protected override void OnInitialized()
     {
         rooms = Mongo.GetAllRooms();
-        sortingRooms = rooms;
     }
 
 
@@ -55,14 +33,15 @@
 
 
 
-    private void Clear()
-    {
-
-    }
-
-    private void OpenCurentClient(Room room)
+    private void OpenCurentRoom(Room room)
     {
         servise.room = room;
-        manager.NavigateTo("clientProfile");
+        manager.NavigateTo("room");
     }
 }
+
+<style>
+    body {
+        background-color: #eeeeee
+    }
+</style>

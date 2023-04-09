@@ -5,37 +5,125 @@
 @inject NavigationManager manager
 @inject SingletonServise servise
 
-
-<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+<section style="color:#363635;" >
+<div>
+    <div>
+        <div style="text-align: center; font-family: Georgia; font-size: 2em;">
+            <span>@currentRoom.Type</span>
+        </div>
     </div>
-    <div class="carousel-inner">
-    <div class="carousel-item active">
-        <img src="images\1.jpg" id="image" class="d-block w-100" alt="...">
+<div class="grid-gallery">
+    <div class="grid-item">
+        <a href="images/img-1.jpg" data-lightbox="gridImage">
+            <img src="images/img-1.jpg" />
+        </a>
     </div>
-    <div class="carousel-item">
-            <img src="images\2.jpg" id="image" class="d-block w-100" alt="...">
+    <div class="grid-item">
+        <a href="images/img-2.jpg" data-lightbox="gridImage">
+            <img src="images/img-2.jpg" />
+        </a>
     </div>
-    <div class="carousel-item">
-            <img src="images\3.jpg" id="image" class="d-block w-100" alt="...">
+    <div class="grid-item">
+        <a href="images/img-3.jpg" data-lightbox="gridImage">
+            <img src="images/img-3.jpg" />
+        </a>
     </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"  data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Предыдущий</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"  data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Следующий</span>
-    </button>
 </div>
+<div style="margin-left: 38%; padding-bottom:40px">
+    <div style="font-size: 20px">
+            <div >
+                <iconify-icon icon="bx:area"></iconify-icon>
+                    @currentRoom.Area м <sup>2</sup>
+            </div>
+            <div style="margin-top: -30px; margin-left: 176px">
+                <iconify-icon icon="pepicons-pop:persons" ></iconify-icon>
+                    @currentRoom.Capacity
+            </div>
+        <div style="margin-top: -30px; margin-left: 300px">
+                <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
+                    @currentRoom.Cost р
+            </div>
+        </div>
+    </div>
+<div >
+    <div class="Caption" >
+        <span>Оснащение номера</span>
+    </div>
+    <div class="ServicesBlock">
+        <div style="width: 30%; ">
+            <div class="Services">
+                <iconify-icon icon="material-symbols:bed-outline"></iconify-icon>
+                King-size bed или 2 одноместные 
+                кровати размером 100*200 см
+            </div>
+            <div class="Services">
+                <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+                Звукоизолированный номер
+            </div>
+            <div class="Services">
+                <iconify-icon icon="ic:outline-live-tv"></iconify-icon>
+                Спутниковое телевидение
+            </div>
+            <div class="Services">
+                <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+                Высокоскоростной беспроводной интернет
+            </div>
+            <div class="Services">
+                <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+                Просторный рабочий стол
+            </div>
+            <div class="Services">
+                <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+                Мини-бар
+            </div>
+        </div>
+        <div style="width: 35%; padding-left: 45px;">
+            <div class="Services">
+                <iconify-icon icon="bi:safe"></iconify-icon>
+                Сейф
+            </div>
+            <div class="Services">
+                <iconify-icon icon="game-icons:slippers"></iconify-icon>
+                Халат, тапочки
+            </div>
+            <div class="Services">
+                <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+                Фен, мыло, шампунь, гель для душа
+            </div>
+            <div class="Services">
+                <iconify-icon icon="tabler:teapot"></iconify-icon>
+                Чайная станция
+            </div>
+            <div class="Services">
+                <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+                Набор для приготовления чая/кофе
+            </div>
+            <div class="Services">
+                <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+                Просторная ванная комната с подогреваемым полом
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<div class="Caption">
+            <span> Описание</span>
+        </div>
+        <div style="width: 60%; margin-left: 15%; font-size: 17px; padding: 1rem 1rem 2rem 1rem">
+            <div>
+                Современный звукоизолированный номер с 1 большой либо 2 раздельными кроватями – идеальный выбор для бизнес-путешественника. Площадь номера от 24 до 32 кв.м.<br><br>
+                Безупречная планировка номера и современные технологии создают комфортные условия для отдыха и работы.
+            </div>
+        </div>
+</section>
 
 @code {
+    Room? currentRoom;
 
-
+    protected override void OnInitialized()
+    {
+        currentRoom = servise.room;
+    }
 
     private void Editing()
     {
@@ -44,6 +132,43 @@
 }
 
 <style>
+    body {
+        background-color: #eeeeee
+    }
+
+    .ServicesBlock {
+        font-size: 15.5px;
+        width: 80%;
+        margin-left: 16%;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 1rem 0 2rem 0;
+    }
+
+    .Caption {
+        margin-left: 16%;
+        margin-top: 20px;
+    }
+
+    .Caption span {
+        font-family: Georgia;
+        font-size: 1.5em;
+        padding-left: 20px;
+    }
+
+    .Services {
+        position: relative;
+        margin: 7px;
+        padding: 7px 0;
+        padding-left: 40px;
+        line-height: 1.2;
+    }
+
+    iconify-icon {
+        position: absolute;
+        margin-left: -32px;
+        font-size: 23px;
+    }
 /*    #carouselExampleIndicators {
         margin: auto;
     }*/
@@ -52,5 +177,42 @@
         border: 1px solid black;
         border-radius: 15px;
         width:600px;
+    }
+
+    .grid-gallery {
+        width: 938px;
+        margin: 0 auto;
+        padding: 30px 20px 25px 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        grid-auto-rows: 150px;
+        grid-auto-flow: dense;
+        grid-gap: 20px;
+    }
+
+    .grid-gallery .grid-item {
+        position: relative;
+        background-color: #efefef;
+        overflow: hidden;
+    }
+
+    .grid-gallery .grid-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .grid-gallery .grid-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .grid-gallery .grid-item a {
+        cursor: zoom-in;
+    }
+
+    .grid-gallery .grid-item:nth-child(1) {
+        grid-column: span 2;
+        grid-row: span 2;
     }
 </style>
