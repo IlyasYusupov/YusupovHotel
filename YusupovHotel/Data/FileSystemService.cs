@@ -18,30 +18,33 @@ namespace YusupovHotel.Data
             //File.Delete(path);
         }
 
-        //public static string Save(byte[] fileBytes, Room room)
-        //{
-        //    room.images = fileBytes;
-        //    //return 
+        public static void SaveRoomPhotos(List<byte[]> fileBytes, Room room)
+        {
+            room.photos = fileBytes;
+            Mongo.AddRoomToDB(room);
+        }
 
-        //}
+        public static Room GetRoomPhotos(Room room)
+        {
+            var newRoom = room;
+            newRoom.photosUrl = new();
+            for (int i = 0; i < newRoom.photos.Count; i++)
+            {
+                newRoom.photos[i] = GetImages(Convert.ToBase64String(newRoom.photos[i]));
+                newRoom.photosUrl.Add(string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(newRoom.photos[i])));
+            }
+            return newRoom;
+        }
 
-        //public static Room GetRoom(Room room)
-        //{
-        //    var newRoom = room;
-        //    newRoom.images = GetImages(Convert.ToBase64String(newRoom.images));
-        //    newRoom.imagesUrl[0] = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(newRoom.images));
-        //    return newRoom;
-        //}
-
-        //public static byte[] GetImages(string bas)
-        //{
-        //    byte[] bytes = null;
-        //    if(!string.IsNullOrEmpty(bas))
-        //    {
-        //        bytes = Convert.FromBase64String(bas);
-        //    }
-        //    return bytes;
-        //}
+        public static byte[] GetImages(string bas)
+        {
+            byte[] bytes = null;
+            if (!string.IsNullOrEmpty(bas))
+            {
+                bytes = Convert.FromBase64String(bas);
+            }
+            return bytes;
+        }
         //static public async Task DownloadToLocal(string webRootPath, Room room)
         //{
         //    //var client = new MongoClient();

@@ -14,18 +14,18 @@
     </div>
 <div class="grid-gallery">
     <div class="grid-item">
-            <a href="@currentRoom.images[0]" data-lightbox="gridImage">
-            <img src="@currentRoom.images[0]" />
+                <a href="@currentRoom.photosUrl[0]" data-lightbox="gridImage">
+                    <img src="@currentRoom.photosUrl[0]" />
         </a>
     </div>
     <div class="grid-item">
-            <a href="@currentRoom.images[1]" data-lightbox="gridImage">
-            <img src="@currentRoom.images[1]" />
+                <a href="@currentRoom.photosUrl[1]" data-lightbox="gridImage">
+                    <img src="@currentRoom.photosUrl[1]" />
         </a>
     </div>
     <div class="grid-item">
-            <a href="@currentRoom.images[2]" data-lightbox="gridImage">
-            <img src="@currentRoom.images[2]" />
+                <a href="@currentRoom.photosUrl[2]" data-lightbox="gridImage">
+                    <img src="@currentRoom.photosUrl[2]" />
         </a>
     </div>
 </div>
@@ -37,7 +37,7 @@
             </div>
             <div style="margin-top: -30px; margin-left: 176px">
                 <iconify-icon icon="pepicons-pop:persons" ></iconify-icon>
-                    @currentRoom.Capacity 2
+                    @currentRoom.Capacity 
             </div>
         <div style="margin-top: -30px; margin-left: 300px">
                 <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
@@ -110,7 +110,7 @@
             <span> Описание</span>
         </div>
         <div style="width: 60%; margin-left: 15%; font-size: 17px; padding: 1rem 1rem 2rem 1rem">
-            <div>
+            <div style="margin-left:18px">
             @currentRoom.Description
 @*                Современный звукоизолированный номер с 1 большой либо 2 раздельными кроватями – идеальный выбор для бизнес-путешественника. Площадь номера от 24 до 32 кв.м.<br><br>
                 Безупречная планировка номера и современные технологии создают комфортные условия для отдыха и работы.*@
@@ -147,7 +147,7 @@
     }
 
     .Caption {
-        margin-left: 16%;
+        margin-left: 17%;
         margin-top: 20px;
     }
 

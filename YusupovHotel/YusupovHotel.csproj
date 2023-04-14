@@ -7,14 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlazorInputFile" Version="0.2.0" />
     <PackageReference Include="BlazorInputMask" Version="1.0.14" />
     <PackageReference Include="MongoDB.Bson" Version="2.19.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.19.1" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.1" />
     <PackageReference Include="Validation" Version="2.5.51" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\roomsImages\" />
   </ItemGroup>
 </Project>

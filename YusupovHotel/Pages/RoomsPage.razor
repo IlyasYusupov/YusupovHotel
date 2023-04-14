@@ -5,6 +5,8 @@
 @inject NavigationManager manager
 @inject SingletonServise servise
 @inject IWebHostEnvironment Environment
+@using System.IO;
+
 
 <section>
     <div class="modal fade" id="modalRegisterForm" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -16,16 +18,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" >
                 </button>
             </div>
+             <EditForm Model="@roomModel" class="formRegistr" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
         <div class="modal-body mx-3">
                 <div class="md-form mb-5">
-                    <i class="fas fa-user prefix grey-text" ></i>
+                        <iconify-icon icon="tabler:number"></iconify-icon>
                     <div id="inputBox">
                         <input class="fas fa-envelope prefix grey-text" required="required" @bind-value="number" type="text" />
                         <span id="span">Номер комнаты</span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
-                    <i class="fas fa-envelope prefix grey-text" ></i>
+                        <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
                         <div class="typeList" >
                         <select @bind=type required="required"
                             class="dropdown" style="outline:none; outline-style:none">
@@ -39,28 +43,28 @@
                     </div>
                 </div>
                 <div class="md-form mb-5">
-                    <i class="fas fa-phone prefix grey-text"></i>
+                    <iconify-icon icon="pepicons-pop:persons"></iconify-icon>
                     <div id="inputBox">
                         <input class="fas fa-envelope prefix grey-text" type="text" required="required" @bind-value="capacity" data-mask="+7(000)-000-00-00" />
                         <span id="span">Вместимость</span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
-                        <i class="fas fa-envelope prefix grey-text"></i>
+                        <iconify-icon icon="bx:area"></iconify-icon>
                     <div id="inputBox">
                         <input class="fas fa-envelope prefix grey-text" type="text" required="required" @bind-value="area" data-mask="+7(000)-000-00-00" />
                         <span id="span">Площадь</span>
                     </div>
                 </div>
                     <div class="md-form mb-5">
-                        <i class="fas fa-envelope prefix grey-text"></i>
+                        <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
                         <div id="inputBox">
                             <input class="fas fa-envelope prefix grey-text" type="text" required="required" @bind-value="cost" data-mask="+7(000)-000-00-00" />
                             <span id="span">Цены за ночь</span>
                         </div>
                     </div>
                     <div class="md-form mb-5">
-                        <i class="fas fa-envelope prefix grey-text"></i>
+                        <iconify-icon icon="mdi:text-box"></iconify-icon>
                         <div id="inputBox">
                             <div class="description">
                                 <textarea class="fas fa-envelope prefix grey-text" style="font-size: 14px;" type="text" @bind="description" required="required" rows="4" />
@@ -69,13 +73,13 @@
                         </div>
                     </div>
                     <div class="md-form mb-5">
-                        <InputFile OnChange="@LoadFiles" class="form-control" multiple accept=".png,.jpg,.jpeg" />
+                        <BlazorInputFile.InputFile OnChange="@LoadFiles" class="form-control" multiple accept=".png,.jpg,.jpeg" />
                         <div style="display:flex; align-content:center;" >
-                            @if (images.Count > 0)
+                            @if (imgSrc.Count > 0)
                             {
-                                <img src="@images[0]" class="fit-picture" height="140" width="145" style="padding:10px"/>
-                                <img src="@images[1]" class="fit-picture" height="140" width="145" style="padding:10px" />
-                                <img src="@images[2]" class="fit-picture" height="140" width="145" style="padding:10px" />
+                                <img src="@imgSrc[0]" class="fit-picture" height="140" width="145" style="padding:10px"/>
+                                <img src="@imgSrc[1]" class="fit-picture" height="140" width="145" style="padding:10px" />
+                                <img src="@imgSrc[2]" class="fit-picture" height="140" width="145" style="padding:10px" />
                             }
                         </div>
                     </div>
@@ -83,6 +87,7 @@
             <div class="modal-footer d-flex justify-content-center">
                 <button class="btn btn-default btn-success" type="submit" @onclick=AddNewRoom>Добавить</button>
             </div>
+                </EditForm>
         </div>
     </div>
 </div>
@@ -99,7 +104,7 @@
             {
             <div class="grid-item">
                 <a href="room" @onclick="()=> OpenCurentRoom(room)">
-                    <img src="@room.images[0]" alt="Snow">
+                        <img src="@room.photosUrl[0]" alt="Snow">
                 </a>
                 <span style="font-size: 28px; top: 69%;">@room.Type</span>
                 <span style="font-size: 18px; top: 78%;">Цена: @room.Cost р</span>
@@ -107,17 +112,6 @@
             </div>
             }
         }
-@*        else
-        {
-            <div class="grid-item">
-                <a href="room">
-                <img src="images/img-3.jpg" alt="Snow">
-            </a>
-            <span style="font-size: 28px; top: 69%;">Бизнес</span>
-            <span style="font-size: 18px; top: 78%;">Цена: 7000 р</span>
-            <button class="btn">Забронировать</button>
-        </div>
-        }*@
     </div>
 </section>
 
@@ -125,81 +119,65 @@
 @code
 {
     List<Room> rooms = new List<Room>();
-    List<string> roomsPreview = new List<string>();
+    Room roomModel = new Room(0,"",0,0,0,"");
+    bool wasSubmitted;
     string number = "";
     string type = "";
     string capacity = "";
     string area = "";
     string cost = "";
     string description = "";
-    List<string> images = new List<string>();
+    List<string> imgSrc = new List<string>();
+    IFileListEntry file = null;
+    List<byte[]> fileBytes = new List<byte[]>();
 
-    string stringPath = "";
-    private bool isLoading;
-    int maxAllowedFiles = 3;
 
     protected override async void OnInitialized()
     {
         rooms = Mongo.GetAllRooms();
-        
-    }
-
-    private async Task LoadPreview()
-    {
         foreach (var room in rooms)
         {
-            var img = room.images[1];
-            //await FileSystemService.DownloadToLocal($"{Environment.WebRootPath}\\{img}", room);
+            FileSystemService.GetRoomPhotos(room);
         }
     }
 
-    private async Task AddNewRoom()
+    private void AddNewRoom()
     {
-        if(images.Count > 0)
-        {
-            Room newRoom = new Room(int.Parse(number), type, int.Parse(capacity), Double.Parse(area), int.Parse(cost), description);
-            newRoom.images = images;
-            Mongo.AddRoomToDB(newRoom);
-            rooms.Add(newRoom);
-            foreach(var img in images)
-            {
-                await FileSystemService.UploadFileToDb($"{Environment.WebRootPath}\\{img}", img.Split("\\")[1]);
-            }
-        }
+        Room newRoom = new Room(int.Parse(number), type, int.Parse(capacity), Double.Parse(area), int.Parse(cost), description);
+        FileSystemService.SaveRoomPhotos(fileBytes, newRoom);
     }
+
+    public void Submit()
+    {
+        wasSubmitted = true;
+        AddNewRoom();
+    }
+
 
     private void OpenCurentRoom(Room room)
     {
         servise.room = room;
-        //FileSystemService.DownloadToLocal(Environment.WebRootPath, room);
     }
 
-    private async Task LoadFiles(InputFileChangeEventArgs e)
+    private async Task LoadFiles(IFileListEntry[] files)
     {
-        images.Clear();
-        var count = 1;
-        try
+        imgSrc.Clear();
+        fileBytes.Clear();
+        if(files.Count() > 0 )
         {
-            isLoading = true;
-            if (e.FileCount > maxAllowedFiles || e.FileCount < maxAllowedFiles)
-                return;
-            foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+            for (int i = 0; i < files.Count(); i++)
             {
-                var path = $"{Environment.WebRootPath}\\roomsImages\\room{number}_image{count}.{file.Name.Split(".")[1]}";
-                using (FileStream fs = new(path, FileMode.Create))
+                file = files[i];
+                using (var stream = new MemoryStream())
                 {
-                    await file.OpenReadStream(1000000000).CopyToAsync(fs);
+                    await file.Data.CopyToAsync(stream);
+                    fileBytes.Add(stream.ToArray());
+                    var images = FileSystemService.GetImages(Convert.ToBase64String(fileBytes[i]));
+                    imgSrc.Add(string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(images)));
                 }
-                images.Add($"roomsImages\\room{number}_image{count}.{file.Name.Split(".")[1]}");
-                count++;
             }
         }
-        catch (Exception ex)
-        {
-        }
     }
-
-    
 }
 
 <style>
@@ -413,10 +391,10 @@
         margin-left: 2.5rem;
     }
 
-    .md-form .prefix {
+    .md-form iconify-icon {
         position: relative;
         transition: color .2s;
-        font-size: 1.75rem;
+        font-size: 2.1rem;
     }
 
     .sr-only {
