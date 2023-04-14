@@ -1,6 +1,6 @@
 ﻿@page "/clients"
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>Clients</PageTitle>
 
 @inject IJSRuntime js
 @inject NavigationManager manager
@@ -24,7 +24,7 @@
                     <div id="inputBox">
                         <InputText class="fas fa-envelope prefix grey-text" required="required" type="text" @bind-Value="client.ClientName"></InputText>
                         <span id="span">Фамилия, имя, отчество</span>
-                                <span style="margin-top: -4px"><ValidationMessage For="() => client.ClientName" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => client.ClientName" /></span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
@@ -40,7 +40,7 @@
                     <div id="inputBox">
                         <InputMask class="fas fa-envelope prefix grey-text" type="text" required="required" @bind-Value="client.PhoneNumber" data-mask="+7(000)-000-00-00" />
                         <span id="span">Номер телефона</span>
-                                <span style="margin-top: -4px"><ValidationMessage For="() => client.PhoneNumber" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => client.PhoneNumber" /></span>
                     </div>
                 </div>
         </div>
@@ -51,14 +51,14 @@
         </div>
     </div>
 </div>
-<div  class="appbar">
+<div  class="appbar"  style="margin: 20px 0 0 10%">
     <input id="searching" class="sort" type="text" @bind="Search" @bind:event="oninput" @onkeyup="Searching" required="required" placeholder="Поиск">
     <i id="searching" class="fas fa-search prefix grey-text"></i>
     <button id="newClient" class="btn btn-default btn-success" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
     Добавить нового клиента
 </button>
 </div>
-    <table class="table" style="overflow-y:auto">
+    <table class="table" style="overflow-y:auto; width: 80%; margin: 40px 10%; ">
         <thead >
             <tr>
                 <th>Фамиля, имя, отчество</th>
@@ -144,7 +144,8 @@
 
     #newClient {
         position: absolute;
-        margin-left: 70%;
+        margin-left: 15%;
+        margin-top: -1px;
     }
 
     #searching { 

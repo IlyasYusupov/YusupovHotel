@@ -9,23 +9,23 @@
 <div>
     <div>
         <div style="text-align: center; font-family: Georgia; font-size: 2em;">
-            <span>@currentRoom.Type</span>
+            <span>Бизнес номер @currentRoom.Type</span>
         </div>
     </div>
 <div class="grid-gallery">
     <div class="grid-item">
-        <a href="images/img-1.jpg" data-lightbox="gridImage">
-            <img src="images/img-1.jpg" />
+            <a href="@currentRoom.images[0]" data-lightbox="gridImage">
+            <img src="@currentRoom.images[0]" />
         </a>
     </div>
     <div class="grid-item">
-        <a href="images/img-2.jpg" data-lightbox="gridImage">
-            <img src="images/img-2.jpg" />
+            <a href="@currentRoom.images[1]" data-lightbox="gridImage">
+            <img src="@currentRoom.images[1]" />
         </a>
     </div>
     <div class="grid-item">
-        <a href="images/img-3.jpg" data-lightbox="gridImage">
-            <img src="images/img-3.jpg" />
+            <a href="@currentRoom.images[2]" data-lightbox="gridImage">
+            <img src="@currentRoom.images[2]" />
         </a>
     </div>
 </div>
@@ -37,11 +37,11 @@
             </div>
             <div style="margin-top: -30px; margin-left: 176px">
                 <iconify-icon icon="pepicons-pop:persons" ></iconify-icon>
-                    @currentRoom.Capacity
+                    @currentRoom.Capacity 2
             </div>
         <div style="margin-top: -30px; margin-left: 300px">
                 <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
-                    @currentRoom.Cost р
+                    @currentRoom.Cost р 
             </div>
         </div>
     </div>
@@ -111,8 +111,9 @@
         </div>
         <div style="width: 60%; margin-left: 15%; font-size: 17px; padding: 1rem 1rem 2rem 1rem">
             <div>
-                Современный звукоизолированный номер с 1 большой либо 2 раздельными кроватями – идеальный выбор для бизнес-путешественника. Площадь номера от 24 до 32 кв.м.<br><br>
-                Безупречная планировка номера и современные технологии создают комфортные условия для отдыха и работы.
+            @currentRoom.Description
+@*                Современный звукоизолированный номер с 1 большой либо 2 раздельными кроватями – идеальный выбор для бизнес-путешественника. Площадь номера от 24 до 32 кв.м.<br><br>
+                Безупречная планировка номера и современные технологии создают комфортные условия для отдыха и работы.*@
             </div>
         </div>
 </section>

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using System.ComponentModel.DataAnnotations;
 
 namespace YusupovHotel.Data
 {
@@ -24,6 +25,7 @@ namespace YusupovHotel.Data
 
         public string Type { get; set; }
 
+
         public int Capacity { get; set; }
 
         public double Area { get; set; }
@@ -32,7 +34,11 @@ namespace YusupovHotel.Data
 
         public string Description { get; set; }
 
-        List<string> images = new List<string>();
+        [BsonIgnoreIfNull]
+        public byte[] images { get; set; }
+
+        [BsonIgnoreIfNull]
+        public List<string> imagesUrl = new List<string>();
 
     }
 }

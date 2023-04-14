@@ -2,5 +2,64 @@
 
 <PageTitle>Profile</PageTitle>
 
+
+<style>
+
+.custom-btn {
+    width: 130px;
+    height: 40px;
+    color: #fff;
+    border-radius: 1px 25px 25px 25px;
+    padding: 12px 38px 12px 38px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    border-color: none;
+    outline: none;
+}
+
+.btn-15 {
+    background: #363635;
+        
+    border: none;
+    z-index: 1;
+}
+
+.btn-15:after {
+    position: absolute;
+    content: "";
+    width: 0;
+    border-color: none;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: -1;
+    background-color: #badbd5;
+    border-radius: 1px 25px 25px 25px;
+            
+    transition: all 0.3s ease;
+}
+
+        .btn-15:hover {
+            color: #fff;
+        }
+
+            .btn-15:hover:after {
+                left: 0;
+                width: 100%;
+            }
+
+        .btn-15:active {
+            top: 2px;
+        }
+
+</style>
+
+
+
 @inject NavigationManager manager
 @inject SingletonServise servise
