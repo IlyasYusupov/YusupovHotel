@@ -5,26 +5,15 @@ namespace YusupovHotel.Data
 {
     static public class FileSystemService
     {
-        static public async Task UploadFileToDb(string path, string fileName)
-        {
-            var client = new MongoClient();
-            var database = client.GetDatabase("HotelBase");
-            var gridFS = new GridFSBucket(database);
-
-            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                gridFS.UploadFromStream(fileName, fs);
-            }
-            //File.Delete(path);
-        }
-
-        public static void SaveRoomPhotos(List<byte[]> fileBytes, Room room)
+        public static Room SaveRoomWithPhotos(List<byte[]> fileBytes, Room room)
         {
             room.photos = fileBytes;
             Mongo.AddRoomToDB(room);
+            GetRoomWithPhotos(room);
+            return room;
         }
 
-        public static Room GetRoomPhotos(Room room)
+        public static Room GetRoomWithPhotos(Room room)
         {
             var newRoom = room;
             newRoom.photosUrl = new();
@@ -45,24 +34,6 @@ namespace YusupovHotel.Data
             }
             return bytes;
         }
-        //static public async Task DownloadToLocal(string webRootPath, Room room)
-        //{
-        //    //var client = new MongoClient();
-        //    //var database = client.GetDatabase("HotelBase");
-        //    //var gridFS = new GridFSBucket(database);
-
-        //    //foreach (var img in room.images)
-        //    //{
-        //    //    using (Stream fs = new FileStream($"{webRootPath}\\{img}", FileMode.Create))
-        //    //    {
-        //    //        try
-        //    //        {
-        //    //            await gridFS.DownloadToStreamByName(img.Split("\\")[1], fs);
-        //    //        }
-        //    //        catch { }
-        //    //    }
-        //    //}
-        //}
     }
 }
 

@@ -5,6 +5,92 @@
 @inject SingletonServise servise
 
 <section> 
+    <div class="modal fade" id="modalRegisterForm" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Бронирование номера</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" >
+                    </button>
+                </div>
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-5">
+                            <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
+                            <div class="typeList" >
+                            <select @bind="roomType" @onclick="GetRoomWithSelectType" required="required"
+                                class="dropdown" style="outline:none; outline-style:none">
+                                <option selected disabled></option>
+                                <option value="Стандарт">Стандарт</option>
+                                <option value="Бизнес">Бизнес</option>
+                                <option value="Люкс одноместный">Люкс одноместный</option>
+                                <option value="Люкс однокомнатный">Люкс двухкомнатный</option>
+                                <option value="Люкс премиум">Люкс премиум</option>
+                                </select>
+                                <span id="span">Тип номера</span>
+                            </div>
+                        </div>
+                    <div class="md-form mb-5">
+                            <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
+                            <div class="typeList" >
+                            <select @bind="roomNumber" required="required"
+                                class="dropdown" style="outline:none; outline-style:none">
+                                <option selected disabled></option>
+                                @foreach (var room in sortingRooms)
+                                {
+                                    <option value="@room.Number">@room.Number</option>
+                                }
+                                </select>
+                                <span id="span">Тип номера</span>
+                            </div>
+                        </div>
+                        <div class="md-form mb-5">
+                            <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
+                        <div id="inputBox" class="inputBoxClients">
+                            <input class="fas fa-envelope prefix grey-text" type="text" @bind="nameClient" @bind:event="oninput" @onkeyup="Searching" required="required">
+                            <span id="span">Клиент</span>
+                            <div class="dropdownClients">
+                                @foreach (var client in sortingClients)
+                                {
+                                    <a @onclick="() => SelectCleint(client)">@client.ClientName</a>
+                                }
+                            </div>
+                            </div>
+                        </div>
+                    <div class="md-form mb-5">
+                        <iconify-icon icon="tabler:number"></iconify-icon>
+                        <div id="inputBox">
+                            <input name="date" @bind="chekInDate" type="text" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <span id="span">Дата заезда</span>
+                        </div>
+                    </div>
+                    <div class="md-form mb-5">
+                        <iconify-icon icon="tabler:number"></iconify-icon>
+                        <div id="inputBox">
+                            <input name="date" @bind="chekOutDate" type="text" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <span id="span">Дата выезда</span>
+                        </div>
+                    </div>
+                    <div class="md-form mb-5">
+                        <iconify-icon icon="tabler:number"></iconify-icon>
+                        <div id="inputBox">
+                            <input @bind=adaltCnt class="fas fa-envelope prefix grey-text" required="required" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
+                            <span id="span">Кол-во взрослых</span>
+                        </div>
+                    </div><div class="md-form mb-5">
+                        <iconify-icon icon="tabler:number"></iconify-icon>
+                        <div id="inputBox">
+                            <input @bind=childeCnt class="fas fa-envelope prefix grey-text" required="required" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
+                            <span id="span">Кол-во детей</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button class="btn btn-default btn-success" type="button" @onclick="AddNewBook">Добавить</button>
+                    </div>
+            </div>
+        </div>
+        </div>
     <button id="newClient" class="btn btn-default btn-success" @onclick=" () => NewBooking()" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
         Забронировать
     </button><table class="table">
@@ -39,24 +125,190 @@
 @code {
     List<Booking> booking = new List<Booking>();
     List<Booking> sortingBooking = new List<Booking>();
+    List<Room> rooms = new List<Room>();
+    List<Room> sortingRooms = new List<Room>();
+    List<Client> clients = new List<Client>();
+    List<Client> sortingClients = new List<Client>();
+    Booking bookModel = new Booking();
+    string nameClient = "";
+    string chekInDate;
+    string chekOutDate;
+    Client client;
+    int adaltCnt;
+    int childeCnt;
+    //string nameClient = "";
+    //string nameClient = "";
+    string roomNumber;
+    string roomType = "";
+    bool wasSubmitted;
+
 
     protected override void OnInitialized()
     {
         js.InvokeVoidAsync("ChangePanelsState");
         booking = Mongo.FindAllBooking();
         sortingBooking = booking;
+        clients = Mongo.FindAllClient();
+        sortingClients = clients;
+        rooms = Mongo.GetAllRooms();
+        sortingRooms = rooms;
+    }
+
+    public void Submit()
+    {
+        wasSubmitted = true;
     }
 
     private void NewBooking()
     {
         //servise.booking = newBooking;
-        manager.NavigateTo("booking");
+        //manager.NavigateTo("booking");
+    }
+
+    private void AddNewBook()
+    {
+        var room = Mongo.GetRoom(int.Parse(roomNumber));
+        int year = int.Parse(chekInDate.Split('-')[0]);
+        int mounth = int.Parse(chekInDate.Split('-')[1]);
+        int day = int.Parse(chekInDate.Split('-')[2]);
+        var arrivalDate = new DateTime(year, mounth, day);
+        int year1 = int.Parse(chekOutDate.Split('-')[0]);
+        int mounth1 = int.Parse(chekOutDate.Split('-')[1]);
+        int day1 = int.Parse(chekOutDate.Split('-')[2]);
+        var departureDate = new DateTime(year1, mounth1, day1);
+        var price = Convert.ToDouble(room.Cost) * int.Parse(((departureDate - arrivalDate).Days).ToString());
+        Booking newBook = new Booking(room, client, arrivalDate, departureDate, price);
+        Mongo.AddBookingToDB(newBook);
+    }
+
+    private void GetRoomWithSelectType()
+    {
+        sortingRooms = rooms.Where((element) =>
+            element.Type.ToLower().Contains(roomType.ToLower()))
+        .ToList();
+    }
+
+    private void Searching()
+    {
+        sortingClients = clients.Where((element) =>
+            element.ClientName.ToLower().Contains(nameClient.ToLower()))
+        .ToList();
+    }
+
+    private void SelectCleint(Client selectedClient)
+    {
+        nameClient = selectedClient.ClientName;
+        client = selectedClient;
     }
 }
 
 <style>
     body {
         background-color: #eeeeee
+    }
+
+    .dropdownClients{
+        /*display: none;*/
+        overflow-y:scroll; 
+        overflow-x:hidden; 
+        margin-left: 2.6rem;
+        width: 400px; 
+        min-height:30px; 
+        max-height:100px;
+    }
+
+    .dropdownClients a{
+        cursor: pointer;
+        width: 400px;
+        display: block;
+    }
+
+    .typeList {
+        position: relative;
+        margin-top: -33px;
+    }
+    .typeList select {
+
+        background: transparent;
+        outline: none;
+        font-size: 16px;
+        border: 0;
+        border-radius: 0px;
+        border-bottom: 1px solid #ced4da;
+        height: 35px;
+        width: 400px;
+        margin-left: 2.6rem;
+    }
+
+    #span {
+        margin-top: -30px;
+    }
+
+    #inputBox {
+        position: relative;
+        margin-top: -40px;
+    }
+
+    #inputBox input {
+        background-color: transparent;
+        border: 0;
+        border-bottom: 1px solid #ced4da;
+        border-radius: 0;
+        outline: none;
+        color: black;
+        font-size: 14px;
+        margin-left: 2.6rem;
+        height: 30px;
+        width: 400px;
+    }
+
+    #inputBox span, .typeList span {
+        position: absolute;
+        left: 45px;
+        padding: 4px;
+        pointer-events: none;
+        font-size: 0.8em;
+        color: gray;
+        text-transform: uppercase;
+        transition: 0.5s;
+    }
+
+    .typeList select:active {
+        border-color: #ced4da;
+        outline: none;
+    }
+
+    .typeList select:valid ~ #span,
+    .typeList select:focus ~ #span,
+    #inputBox input:valid ~ #span,
+    #inputBox input:focus ~ #span {
+        color: grey;
+        transform: translateX(-1px) translateY(-15px);
+        font-size: 0.6em;
+        background: none;
+        letter-spacing: 0.2em;
+    }
+
+
+
+    .inputBoxClients input:valid ~ .dropdownClients,
+    .inputBoxClients input:focus ~ .dropdownClients,
+    .dropdownClients a:focus ~ .dropdownClients {
+        display: block;
+    }
+
+
+
+    .md-form .prefix ~ input, select, textarea {
+        width: calc(100% - 2rem);
+        margin-left: 2.5rem;
+    }
+
+    .md-form iconify-icon {
+        position: relative;
+        transition: color .2s;
+        font-size: 2.1rem;
+        top: 5px;
     }
 
 </style>

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
+using YusupovHotel.Shared;
 
 namespace YusupovHotel.Data
 {
@@ -15,6 +16,9 @@ namespace YusupovHotel.Data
             Cost = cost;
             Description = description;
         }
+        public Room()
+        {
+        }
 
 
         [BsonId]
@@ -22,26 +26,26 @@ namespace YusupovHotel.Data
         ObjectId _id;
 
         [Required(ErrorMessage = "Укажите номер комнаты")]
-        public int Number { get; set; }
+        [InputNumberValidation(ErrorMessage = "Такой номер уже зарегистрирован")]
+        public int? Number { get; set; }
 
         [Required(ErrorMessage = "Выберите тип номера")]
         public string Type { get; set; }
 
         [Required(ErrorMessage = "Укажите вместимость номера")]
-        public int Capacity { get; set; }
+        public int? Capacity { get; set; }
 
-        [Required(ErrorMessage = "Укажите рлощадь номера")]
-        public double Area { get; set; }
+        [Required(ErrorMessage = "Укажите площадь номера")]
+        public double? Area { get; set; }
 
         [Required(ErrorMessage = "Стоимость за ночь не указана")]
-        public int Cost { get; set; }
+        public double? Cost { get; set; }
 
         [Required(ErrorMessage = "Поле описание не заполнено")]
+        [StringLength(4000, MinimumLength = 10, ErrorMessage = "Недостаточно описания")]
         public string Description { get; set; }
-
         [BsonIgnoreIfNull]
         public List<byte[]> photos { get; set; }
-        public byte[] images { get; set; }
 
         [BsonIgnoreIfNull]
         public List<string> photosUrl { get; set; }

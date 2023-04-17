@@ -14,6 +14,8 @@ namespace YusupovHotel.Data
             PhoneNumber = phoneNumber;
         }
 
+        public Client()
+        {}
 
         [BsonId]
         [BsonIgnoreIfDefault]

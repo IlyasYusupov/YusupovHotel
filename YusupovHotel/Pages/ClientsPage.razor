@@ -22,7 +22,7 @@
                 <div class="md-form mb-5">
                     <i class="fas fa-user prefix grey-text" ></i>
                     <div id="inputBox">
-                        <InputText class="fas fa-envelope prefix grey-text" required="required" type="text" @bind-Value="client.ClientName"></InputText>
+                        <InputText class="fas fa-envelope prefix grey-text" type="text" @bind-Value=client.ClientName required="required"></InputText>
                         <span id="span">Фамилия, имя, отчество</span>
                         <span style="margin-top: -4px"><ValidationMessage For="() => client.ClientName" /></span>
                     </div>

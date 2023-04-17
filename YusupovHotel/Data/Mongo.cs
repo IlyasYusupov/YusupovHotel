@@ -48,9 +48,10 @@ namespace YusupovHotel.Data
 
         public static List<User> FindAllUser()
         {
+
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
-            var collection = database.GetCollection<User>("User");
+            var collection = database.GetCollection<User>("Users");
             var list = collection.Find(x => true).ToList();
             return list;
         }
@@ -115,12 +116,12 @@ namespace YusupovHotel.Data
             collection.ReplaceOne(z => z.Email == email, newClient);
         }
 
-        public static Booking FindBooking(int bookingId)
+        public static Booking FindBooking(Client currenrClient)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<Booking>("Bookings");
-            var one = collection.Find(x => x.BookingId == bookingId).FirstOrDefault();
+            var one = collection.Find(x => x.Client == currenrClient).FirstOrDefault();
             return one;
         }
 
@@ -133,12 +134,12 @@ namespace YusupovHotel.Data
             return list;
         }
 
-        public static void ReplaceBooking(int bookingId, Booking newBooking)
+        public static void ReplaceBooking(Client currenrClient, Booking newBooking)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<Booking>("Bookings");
-            collection.ReplaceOne(z => z.BookingId == bookingId, newBooking);
+            collection.ReplaceOne(z => z.Client == currenrClient, newBooking);
         }
     }
 }
