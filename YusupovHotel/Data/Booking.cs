@@ -6,13 +6,15 @@ namespace YusupovHotel.Data
 {
     public class Booking
     {
-        public Booking(Room room, Client client, DateTime arrivalDate, DateTime departureDate, double totalPrice)
+        public Booking(Room room, Client client, int adaltCount, int childCount, DateOnly arrivalDate, DateOnly departureDate, double totalPrice)
         {
             Room = room;
             Client = client;
             ArrivalDate = arrivalDate;
             DepartureDate = departureDate;
             TotalPrice = totalPrice;
+            AdaltCount = adaltCount;
+            ChildCount = childCount;
         }
         public Booking( )
         { }
@@ -26,9 +28,14 @@ namespace YusupovHotel.Data
         [Required]
         public Client Client { get; set; }
         [Required]
-        public DateTime ArrivalDate { get; set; }
+        public int AdaltCount { get; set; }
         [Required]
-        public DateTime DepartureDate { get; set; }
+        public int ChildCount { get; set; }
+
+        [Required]
+        public DateOnly ArrivalDate { get; set; }
+        [Required]
+        public DateOnly DepartureDate { get; set; }
         [Required]
         public double? TotalPrice { get; set; }
     }

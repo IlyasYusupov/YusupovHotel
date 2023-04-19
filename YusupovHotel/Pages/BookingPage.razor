@@ -3,75 +3,102 @@
 @inject NavigationManager manager
 @inject SingletonServise servise
 
-<div class="booking-form">
-    <div class="form-header">
-        <h1>Make your reservation</h1>
-    </div>
-    <form>
-        <div class="form-group">
-            <input class="form-control" type="text" placeholder="Country, ZIP, city...">
-            <span class="form-label">Destination</span>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <input class="form-control" type="date" required>
-                    <span class="form-label">Check In</span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <input class="form-control" type="date" required>
-                    <span class="form-label">Check out</span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <select class="form-control" required>
-                        <option value="" selected hidden>no of rooms</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                    </select>
-                    <span class="select-arrow"></span>
-                    <span class="form-label">Rooms</span>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <select class="form-control" required>
-                        <option value="" selected hidden>no of adults</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                    </select>
-                    <span class="select-arrow"></span>
-                    <span class="form-label">Adults</span>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <select class="form-control" required>
-                        <option value="" selected hidden>no of children</option>
-                        <option>0</option>
-                        <option>1</option>
-                        <option>2</option>
-                    </select>
-                    <span class="select-arrow"></span>
-                    <span class="form-label">Children</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="form-btn">
-            <button class="submit-btn">Book Now</button>
-        </div>
-    </form>
-</div>
-@code {
 
+<div class="row" style="margin: 5% 25% 5% 25%">
+        <div class="col-lg-8" style="width: 800px">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-5">
+                        <p class="mb-0">Клиент</p>
+                        </div>
+                        <div class="col-sm-7">
+                        <p class="text-muted mb-0">@client.ClientName</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <p class="mb-0">Количество взрослых</p>
+                        </div>
+                        <div class="col-sm-7">
+                            <p class="text-muted mb-0">@booking.AdaltCount</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                    <div class="col-sm-5">
+                        <p class="mb-0">Количество детей</p>
+                    </div>
+                    <div class="col-sm-7">
+                    <p class="text-muted mb-0">@booking.ChildCount</p>
+                </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <p class="mb-0">Тип номера</p>
+                    </div>
+                    <div class="col-sm-7">
+                        <p class="text-muted mb-0">@room.Type</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <p class="mb-0">Дата заезда</p>
+                    </div>
+                    <div class="col-sm-7">
+                        <p class="text-muted mb-0">@booking.ArrivalDate</p>
+                    </div>
+                </div>
+            <hr>
+            <div class="row">
+                <div class="col-sm-5">
+                    <p class="mb-0">Дата выезда</p>
+                </div>
+                <div class="col-sm-7">
+                    <p class="text-muted mb-0">@booking.DepartureDate</p>
+                </div>
+            </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-5">
+                <p class="mb-0">Номер</p>
+            </div>
+            <div class="col-sm-7">
+                <p class="text-muted mb-0">@room.Number</p>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-5">
+                <p class="mb-0">Итоговая сумма проживания</p>
+            </div>
+            <div class="col-sm-7">
+                <p class="text-muted mb-0">@booking.TotalPrice</p>
+            </div>
+        </div>
+            <div class="d-flex justify-content-center" id="btnProfil">
+                @*<button type="button"
+                        class="btn btn-success" @onclick=Editing>
+                    Editing
+                </button>*@
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+@code {
+    Client client;
+    Room room;
+    Booking booking;
+    protected override async void OnInitialized()
+    {
+        booking = servise.booking;
+        client = booking.Client;
+        room = booking.Room;
+    }
 }
 
 <style>
