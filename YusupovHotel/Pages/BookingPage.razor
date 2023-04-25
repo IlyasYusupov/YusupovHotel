@@ -22,7 +22,8 @@
                         <p class="mb-0">Клиент</p>
                         </div>
                         <div class="col-sm-7">
-                            <InputText class="bookingInput" @bind-Value="booking.Client.ClientName" disabled="@editing"> </InputText>
+                            <InputText class="bookingInput" @bind-Value="@booking.Client.ClientName" @onchange="v" disabled="@editing"></InputText>
+                            <ValidationMessage For="@(()=>booking.Client.ClientName)"></ValidationMessage>
                         </div>
                     </div>
                     <hr>
@@ -31,7 +32,7 @@
                             <p class="mb-0">Количество взрослых</p>
                         </div>
                         <div class="col-sm-7">
-                            <InputNumber class="bookingInput" @bind-Value="@booking.AdaltCount" disabled="@editing"> </InputNumber>
+                            <InputNumber class="bookingInput" @bind-Value="booking.AdaltCount"  disabled="@editing"> </InputNumber>
                         </div>
                     </div>
                     <hr>
@@ -40,7 +41,7 @@
                         <p class="mb-0">Количество детей</p>
                     </div>
                     <div class="col-sm-7">
-                        <InputNumber class="bookingInput" @bind-Value="@booking.ChildCount" disabled="@editing"> </InputNumber>
+                        <InputNumber class="bookingInput" @bind-Value="booking.ChildCount" disabled="@editing"> </InputNumber>
                 </div>
                 </div>
                 <hr>
@@ -49,7 +50,7 @@
                         <p class="mb-0">Тип номера</p>
                     </div>
                     <div class="col-sm-7">
-                        <InputText class="bookingInput" @bind-Value="@booking.Room.Type" disabled="@editing"> </InputText>
+                            <InputText class="bookingInput" type="text" @bind-Value="booking.Room.Type" disabled="@editing"> </InputText>
                     </div>
                 </div>
                 <hr>
@@ -58,7 +59,7 @@
                         <p class="mb-0">Дата заезда</p>
                     </div>
                     <div class="col-sm-7">
-                        <InputDate class="bookingInput" @bind-Value="@booking.ArrivalDate" disabled="@editing" > </InputDate>
+                        <InputDate class="bookingInput" @bind-Value="booking.ArrivalDate" disabled="@editing" > </InputDate>
                     </div>
                 </div>
             <hr>
@@ -67,7 +68,7 @@
                     <p class="mb-0">Дата выезда</p>
                 </div>
                 <div class="col-sm-7">
-                        <InputDate class="bookingInput" @bind-Value="@booking.DepartureDate" disabled="@editing"> </InputDate>
+                        <InputDate class="bookingInput" @bind-Value="booking.DepartureDate" disabled="@editing"> </InputDate>
                 </div>
             </div>
         <hr>
@@ -76,7 +77,7 @@
                 <p class="mb-0">Номер</p>
             </div>
             <div class="col-sm-7">
-                            <InputNumber class="bookingInput" @bind-Value="@booking.Room.Number" disabled="@editing"> </InputNumber>
+                    <InputNumber class="bookingInput" @bind-Value="@booking.Room.Number"  disabled="@editing"></InputNumber>
             </div>
         </div>
         <hr>
@@ -85,13 +86,17 @@
                 <p class="mb-0">Итоговая сумма проживания</p>
             </div>
             <div class="col-sm-7">
-                            <InputNumber display class="bookingInput" @bind-Value="@booking.TotalPrice" disabled="@editing"> </InputNumber>
+                    <InputNumber display class="bookingInput" @bind-Value="booking.TotalPrice" disabled="@editing"> </InputNumber>
             </div>
         </div>
             <hr>
-            <div class="d-flex justify-content-end" id="btnProfil">
-                <button type="button"
-                                class="btn btn-success" @onclick=Editing>
+            <div class="d-flex justify-content-end"  id="btnProfil">
+                        <button type="button" style="margin-right: 1%;" hidden="@editing"
+                                class="btn btn-danger" @onclick=CancelСhanges>
+                            Отменить
+                        </button>
+                <button type="submit"
+                                class="btn btn-success">
                     @btnText
                 </button>
                 </div>
@@ -106,13 +111,19 @@
     Room room;
     Booking booking;
     bool wasSubmitted;
+    string Name;
     bool editing = true;
     string btnText = "Изменить";
     protected override async void OnInitialized()
     {
+
         booking = servise.booking;
         client = booking.Client;
         room = booking.Room;
+    }
+    public void v()
+    {
+        booking = new Booking(booking.Room, booking.Client, booking.AdaltCount, booking.ChildCount, booking.ArrivalDate, booking.DepartureDate, (double)booking.TotalPrice);
     }
 
     public void Editing()
@@ -131,9 +142,25 @@
         }
     }
 
+    private void CancelСhanges()
+    {
+        editing = true;
+        btnText = "Изменить";
+        booking.Client.ClientName += servise.booking.Client.ClientName;
+        booking.AdaltCount = 100000;
+        booking.ChildCount = servise.booking.ChildCount;
+        booking.Room.Type = servise.booking.Room.Type;
+        booking.ArrivalDate = servise.booking.ArrivalDate;
+        booking.DepartureDate = servise.booking.DepartureDate;
+        booking.Room.Number = servise.booking.Room.Number;
+        booking.TotalPrice = servise.booking.TotalPrice;
+
+    }
+
     public void Submit()
     {
         wasSubmitted = true;
+        Editing();
     }
 }
 
@@ -149,8 +176,9 @@
     
     input {
         width: 98%;
-        outline: none;
+        outline: none!important;
         border: 0;
+        border-bottom: 0.1px solid white;
         height: 37px;
         font-size: 16px;
         margin-top: -2%;

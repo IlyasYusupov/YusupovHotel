@@ -11,6 +11,7 @@ namespace YusupovHotel.Data
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<User>("Users");
             collection.InsertOne(user);
+            
         }
 
         public static void AddRoomToDB(Room room)
