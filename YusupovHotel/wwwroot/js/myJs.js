@@ -11,6 +11,7 @@
         document.getElementById('nav-bar-id').style.display = 'block';
     }
 }
+
 //lightbox.option({
 //    resizeDuration: 100,
 //    wrapAround: true,

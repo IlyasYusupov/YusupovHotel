@@ -2,18 +2,27 @@
 
 @inject NavigationManager manager
 @inject SingletonServise servise
+@inject IJSRuntime js
 
-
-<div class="row" style="margin: 5% 25% 5% 25%">
+<div>
+    <div>
+        <div style="text-align: center; font-family: Georgia; font-size: 2em;">
+            <span>Бронь</span>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin: 2% 25% 5% 25%">
         <div class="col-lg-8" style="width: 800px">
             <div class="card mb-4">
                 <div class="card-body">
+                    <EditForm Model="@booking" class="formRegistr" OnValidSubmit="@Submit" >
+        <DataAnnotationsValidator />
                     <div class="row">
                         <div class="col-sm-5">
                         <p class="mb-0">Клиент</p>
                         </div>
                         <div class="col-sm-7">
-                        <p class="text-muted mb-0">@client.ClientName</p>
+                            <InputText class="bookingInput" @bind-Value="booking.Client.ClientName" disabled="@editing"> </InputText>
                         </div>
                     </div>
                     <hr>
@@ -22,7 +31,7 @@
                             <p class="mb-0">Количество взрослых</p>
                         </div>
                         <div class="col-sm-7">
-                            <p class="text-muted mb-0">@booking.AdaltCount</p>
+                            <InputNumber class="bookingInput" @bind-Value="@booking.AdaltCount" disabled="@editing"> </InputNumber>
                         </div>
                     </div>
                     <hr>
@@ -31,7 +40,7 @@
                         <p class="mb-0">Количество детей</p>
                     </div>
                     <div class="col-sm-7">
-                    <p class="text-muted mb-0">@booking.ChildCount</p>
+                        <InputNumber class="bookingInput" @bind-Value="@booking.ChildCount" disabled="@editing"> </InputNumber>
                 </div>
                 </div>
                 <hr>
@@ -40,7 +49,7 @@
                         <p class="mb-0">Тип номера</p>
                     </div>
                     <div class="col-sm-7">
-                        <p class="text-muted mb-0">@room.Type</p>
+                        <InputText class="bookingInput" @bind-Value="@booking.Room.Type" disabled="@editing"> </InputText>
                     </div>
                 </div>
                 <hr>
@@ -49,7 +58,7 @@
                         <p class="mb-0">Дата заезда</p>
                     </div>
                     <div class="col-sm-7">
-                        <p class="text-muted mb-0">@booking.ArrivalDate</p>
+                        <InputDate class="bookingInput" @bind-Value="@booking.ArrivalDate" disabled="@editing" > </InputDate>
                     </div>
                 </div>
             <hr>
@@ -58,7 +67,7 @@
                     <p class="mb-0">Дата выезда</p>
                 </div>
                 <div class="col-sm-7">
-                    <p class="text-muted mb-0">@booking.DepartureDate</p>
+                        <InputDate class="bookingInput" @bind-Value="@booking.DepartureDate" disabled="@editing"> </InputDate>
                 </div>
             </div>
         <hr>
@@ -67,7 +76,7 @@
                 <p class="mb-0">Номер</p>
             </div>
             <div class="col-sm-7">
-                <p class="text-muted mb-0">@room.Number</p>
+                            <InputNumber class="bookingInput" @bind-Value="@booking.Room.Number" disabled="@editing"> </InputNumber>
             </div>
         </div>
         <hr>
@@ -76,33 +85,59 @@
                 <p class="mb-0">Итоговая сумма проживания</p>
             </div>
             <div class="col-sm-7">
-                <p class="text-muted mb-0">@booking.TotalPrice</p>
+                            <InputNumber display class="bookingInput" @bind-Value="@booking.TotalPrice" disabled="@editing"> </InputNumber>
             </div>
         </div>
-            <div class="d-flex justify-content-center" id="btnProfil">
-                @*<button type="button"
-                        class="btn btn-success" @onclick=Editing>
-                    Editing
-                </button>*@
+            <hr>
+            <div class="d-flex justify-content-end" id="btnProfil">
+                <button type="button"
+                                class="btn btn-success" @onclick=Editing>
+                    @btnText
+                </button>
                 </div>
+                </EditForm>
             </div>
         </div>
+
         </div>
     </div>
 @code {
     Client client;
     Room room;
     Booking booking;
+    bool wasSubmitted;
+    bool editing = true;
+    string btnText = "Изменить";
     protected override async void OnInitialized()
     {
         booking = servise.booking;
         client = booking.Client;
         room = booking.Room;
     }
+
+    public void Editing()
+    {
+        switch (btnText)
+        {
+            case "Изменить":
+                editing = false;
+                btnText = "Сохранить";
+                break;
+            case "Сохранить":
+                editing = true;
+                btnText = "Изменить";
+                Mongo.ReplaceBooking(booking.Client, booking);
+                break;
+        }
+    }
+
+    public void Submit()
+    {
+        wasSubmitted = true;
+    }
 }
 
 <style>
-
 
     body {
         background-color: #eeeeee
@@ -111,7 +146,15 @@
     .vh-100 {
         height: 96vh !important;
     }
-
+    
+    input {
+        width: 98%;
+        outline: none;
+        border: 0;
+        height: 37px;
+        font-size: 16px;
+        margin-top: -2%;
+    }
 
 .section {
     position: relative;
@@ -125,177 +168,5 @@
     right: 0;
     -webkit-transform: translateY(-50%);
     transform: translateY(-50%);
-}
-
-#booking {
-    font-family: 'Raleway', sans-serif;
-}
-
-.booking-form {
-    position: relative;
-    max-width: 642px;
-    width: 100%;
-    margin: auto;
-    padding: 40px;
-    overflow: hidden;
-    background-image: url('https://i.imgur.com/8z1tx3u.jpg');
-    background-size: cover;
-    border-radius: 5px;
-    z-index: 20;
-}
-
-.booking-form::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: -1;
-}
-
-.booking-form .form-header {
-    text-align: center;
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.booking-form .form-header h1 {
-    font-weight: 700;
-    text-transform: capitalize;
-    font-size: 42px;
-    margin: 0px;
-    color: #fff;
-}
-
-.booking-form .form-group {
-    position: relative;
-    margin-bottom: 30px;
-}
-
-.booking-form .form-control {
-    background-color: rgba(255, 255, 255, 0.2);
-    height: 60px;
-    padding: 0px 25px;
-    border: none;
-    border-radius: 40px;
-    color: #fff;
-    -webkit-box-shadow: 0px 0px 0px 2px transparent;
-    box-shadow: 0px 0px 0px 2px transparent;
-    -webkit-transition: 0.2s;
-    transition: 0.2s;
-}
-
-.booking-form .form-control::-webkit-input-placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.booking-form .form-control:-ms-input-placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.booking-form .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.booking-form .form-control:focus {
-    -webkit-box-shadow: 0px 0px 0px 2px #ff8846;
-    box-shadow: 0px 0px 0px 2px #ff8846;
-}
-
-.booking-form input[type="date"].form-control {
-    padding-top: 16px;
-}
-
-.booking-form input[type="date"].form-control:invalid {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.booking-form input[type="date"].form-control+.form-label {
-    opacity: 1;
-    top: 10px;
-}
-
-.booking-form select.form-control {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.booking-form select.form-control:invalid {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.booking-form select.form-control+.select-arrow {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-    width: 32px;
-    line-height: 32px;
-    height: 32px;
-    text-align: center;
-    pointer-events: none;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 14px;
-}
-
-.booking-form select.form-control+.select-arrow:after {
-    content: '\279C';
-    display: block;
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
-}
-
-.booking-form select.form-control option {
-    color: #000;
-}
-
-.booking-form .form-label {
-    position: absolute;
-    top: -10px;
-    left: 25px;
-    opacity: 0;
-    color: #ff8846;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.3px;
-    height: 15px;
-    line-height: 15px;
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-}
-
-.booking-form .form-group.input-not-empty .form-control {
-    padding-top: 16px;
-}
-
-.booking-form .form-group.input-not-empty .form-label {
-    opacity: 1;
-    top: 10px;
-}
-
-.booking-form .submit-btn {
-    color: #fff;
-    background-color: #e35e0a;
-    font-weight: 700;
-    height: 60px;
-    padding: 10px 30px;
-    width: 100%;
-    border-radius: 40px;
-    border: none;
-    text-transform: uppercase;
-    font-size: 16px;
-    letter-spacing: 1.3px;
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-}
-
-.booking-form .submit-btn:hover,
-.booking-form .submit-btn:focus {
-    opacity: 0.9;
 }
 </style>
