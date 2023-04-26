@@ -34,21 +34,21 @@
                     <div class="md-form mb-5">
                         <iconify-icon icon="pepicons-pop:persons"></iconify-icon>
                         <div id="inputBox">
-                                <InputNumber @bind-Value="bookModel.AdaltCount" class="fas fa-envelope prefix grey-text" required="required" @onfocusout="GetRoomForPeopleCount" />
+                                <InputNumber @bind-Value="bookModel.AdaltCount" class="fas fa-envelope prefix grey-text" required="required" @onfocusout="@(() => Sorter("clientCount"))" />
                             <span id="span">Кол-во взрослых</span>
                         </div>
                     </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="pepicons-pop:persons" ></iconify-icon>
                         <div id="inputBox">
-                                <InputNumber @bind-Value="bookModel.ChildCount" class="fas fa-envelope prefix grey-text" @onfocusout="GetRoomForPeopleCount" required="required" />
+                                <InputNumber @bind-Value="bookModel.ChildCount" class="fas fa-envelope prefix grey-text" @onfocusout="@(() => Sorter("clientCount"))" required="required" />
                             <span id="span">Кол-во детей</span>
                         </div>
                     </div>
                         <div class="md-form mb-5">
                         <iconify-icon icon="icon-park-twotone:hotel-please-clean" style="top: 7px;"></iconify-icon>
                             <div class="typeList" >
-                            <InputSelect @bind-Value="roomType" @onclick="GetRoomWithSelectType" required="required"
+                            <InputSelect @bind-Value="roomType" @onclick="@(() => Sorter("roomType"))" required="required"
                                 class="dropdown" style="outline:none; outline-style:none">
                                 <option selected disabled></option>
                                 <option value="Стандарт">Стандарт</option>
@@ -62,17 +62,10 @@
                         </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="ic:baseline-calendar-month"></iconify-icon>
-                        <div id="inputBox">
-                                <input name="date" id="from" @bind="chekInDate" @onfocusout="GetRoomWithoutBooking" type="text" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
-                            <span id="span">Дата заезда</span>
-                        </div>
-                    </div>
-                    <div class="md-form mb-5">
-                        <iconify-icon icon="ic:baseline-calendar-month"></iconify-icon>
-                        <div id="inputBox">
-                            <input name="date" id="to" @bind="chekOutDate" type="text" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
-                            <span id="span">Дата выезда</span>
-                        </div>
+                            <div id="inputBox">
+                                <DateRangePicker MinDate="DateTimeOffset.Now" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required">  </DateRangePicker>
+                                <span id="span">Период проживания</span>
+                            </div>
                     </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="tabler:number" style="top:9px"></iconify-icon>
@@ -101,9 +94,9 @@
         </div>
         </div>
     <div class="appbar" style="margin: 20px 0 0 10%">
-        <input id="searching" class="sort" type="text" @bind="search" @bind:event="oninput" @onkeyup="SearchingForBook" required="required" placeholder="Поиск">
+        <input id="searching" class="sort" type="text" @bind="search" @bind:event="oninput" @onkeyup="BookingSearch" required="required" placeholder="Поиск">
         <i id="searching" class="fas fa-search prefix grey-text"></i>
-        <button id="newBook"  class="btn btn-default btn-success" @onclick=" () => NewBooking()" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
+        <button id="newBook"  class="btn btn-default btn-success" type="submit" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
             Забронировать
         </button>
     </div>
@@ -121,16 +114,32 @@
         <tbody>
             @foreach (var book in sortingBookings)
             {
-                <tr>
-                    <td>@book.Room.Number</td>
-                    <td>@book.Client.ClientName</td>
-                    <td>@book.ArrivalDate</td>
-                    <td>@book.DepartureDate</td>
-                    <td>@book.TotalPrice</td>
-                    <td>
-                        <button class="button" style="vertical-align:middle" @onclick="() => OpenCurrentBooking(book)"><span>Изменить </span></button>
-                    </td>
-                </tr>
+                @if (book.DepartureDate < GetDate(DateTime.Now.Date.ToString("dd,MM,yyyy")))
+                {
+                    <tr style="background-color: lightgray">
+                        <td>@book.Room.Number</td>
+                        <td>@book.Client.ClientName</td>
+                        <td>@book.ArrivalDate</td>
+                        <td>@book.DepartureDate</td>
+                        <td>@book.TotalPrice</td>
+                        <td>
+                            <button class="button1" style="vertical-align:middle; background-color:#6c757d; font-size: 15px;" @onclick="() => OpenPastBooking(book)"><span>Подробнее </span></button>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@book.Room.Number</td>
+                        <td>@book.Client.ClientName</td>
+                        <td>@book.ArrivalDate</td>
+                        <td>@book.DepartureDate</td>
+                        <td>@book.TotalPrice</td>
+                        <td>
+                            <button class="button" style="vertical-align:middle" @onclick="() => OpenCurrentBooking(book)"><span>Изменить </span></button>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -150,8 +159,9 @@
     string clientsSearch = "none";
     string search = "";
     string nameClient = "";
-    string chekInDate = "";
-    string chekOutDate = "";
+    DateTimeOffset? chekInDate;
+    DateTimeOffset? chekOutDate;
+    string date = "";
     Client client;
     string roomNumber;
     string roomType = "";
@@ -165,13 +175,8 @@
         sortingBookings = bookings;
         clients = Mongo.FindAllClient();
         sortingClients = clients;
-        rooms = Mongo.GetAllRooms();
+        rooms = GetRoomWithoutBooking(Mongo.GetAllRooms());
         sortingRooms = rooms;
-    }
-
-    private void JsInvoce()
-    {
-        js.InvokeVoidAsync("date");
     }
 
     public void Submit()
@@ -188,22 +193,29 @@
 
     private void AddNewBook()
     {
-        var room = Mongo.GetRoom(int.Parse(roomNumber));
-        var arrivalDate = GetDate(chekInDate);
-        var departureDate = GetDate(chekOutDate);
-        var price = Convert.ToDouble(room.Cost) * int.Parse(((arrivalDate.Day - departureDate.Day)).ToString());
-        var newBook = new Booking(room, client, (int)bookModel.AdaltCount, (int)bookModel.ChildCount, arrivalDate, departureDate, price);
-        Mongo.AddBookingToDB(newBook);
-        bookings.Add(newBook);
-        SearchingForBook();
+        //var room = Mongo.GetRoom(int.Parse(roomNumber));
+        var arrivalDate = GetDate(chekInDate.ToString().Split(" ")[0]);
+        var departureDate = GetDate(chekOutDate.ToString().Split(" ")[0]);
+        //var price = Convert.ToDouble(room.Cost) * int.Parse(((departureDate.Day - arrivalDate.Day)).ToString());
+        //var newBook = new Booking(room, client, (int)bookModel.AdaltCount, (int)bookModel.ChildCount, arrivalDate, departureDate, price);
+        //Mongo.AddBookingToDB(newBook);
+        //bookings.Add(newBook);
+        ClaerBookingForm();
+        BookingSearch();
     }
 
     private DateOnly GetDate(string date)
     {
-        int year = int.Parse(date.Split('-')[0]);
-        int mounth = int.Parse(date.Split('-')[1]);
-        int day = int.Parse(date.Split('-')[2]);
+        int day = int.Parse(date.Split('.',',')[0]);
+        int mounth = int.Parse(date.Split('.', ',')[1]);
+        int year = int.Parse(date.Split('.', ',')[2]);
         return new DateOnly(year, mounth, day);
+    }
+
+    private void OpenPastBooking(Booking booking)
+    {
+        servise.booking = booking;
+        manager.NavigateTo("bookingForCheck");
     }
 
     private void OpenCurrentBooking(Booking booking)
@@ -212,68 +224,107 @@
         manager.NavigateTo("booking");
     }
 
-    private void SortingRooms()
+    private void Sorter(string sorting)
     {
+        switch (sorting)
+        {
+            case "roomType":
+                if (!isClientCountSortON) GetRoomWithSelectType(rooms);
+                else if (isClientCountSortON)
+                {
+                    GetRoomWithSelectType(rooms);
+                    GetRoomForPeopleCount(sortingRooms);
+                }
+                //else if (!isClientCountSortON && isDateSortON)
+                //{
+                //    GetRoomWithSelectType(rooms);
+                //    GetRoomWithoutBooking(sortingRooms);
+                //}
+                //else if (isClientCountSortON && isDateSortON)
+                //{
+                //    GetRoomWithSelectType(rooms);
+                //    GetRoomForPeopleCount(sortingRooms);
+                //    GetRoomWithoutBooking(sortingRooms);
+                //}
+                break;
 
+            case "clientCount":
+                if (!isRoomTypeSortON) GetRoomForPeopleCount(rooms);
+                else if (isRoomTypeSortON)
+                {
+                    GetRoomForPeopleCount(rooms);
+                    GetRoomWithSelectType(sortingRooms);
+                }
+                //else if (!isRoomTypeSortON && isDateSortON)
+                //{
+                //    GetRoomForPeopleCount(rooms);
+                //    GetRoomWithoutBooking(sortingRooms);
+                //}
+                //else if (isRoomTypeSortON && isDateSortON)
+                //{
+                //    GetRoomForPeopleCount(rooms);
+                //    GetRoomWithSelectType(sortingRooms);
+                //    GetRoomWithoutBooking(sortingRooms);
+                //}
+                break;
+
+            case "date":
+                if (!isRoomTypeSortON) GetRoomWithoutBooking(rooms);
+                else if (isRoomTypeSortON)
+                {
+                    GetRoomWithoutBooking(rooms);
+                    GetRoomWithSelectType(sortingRooms);
+                }
+                //else if (!isRoomTypeSortON && isClientCountSortON)
+                //{
+                //    GetRoomWithoutBooking(rooms);
+                //    GetRoomForPeopleCount(sortingRooms);
+                //}
+                //else if (isRoomTypeSortON && isClientCountSortON)
+                //{
+                //    GetRoomWithoutBooking(rooms);
+                //    GetRoomWithSelectType(sortingRooms);
+                //    GetRoomForPeopleCount(sortingRooms);
+                //}
+                break;
+        }
     }
 
-    private void GetRoomWithSelectType()
+    private void GetRoomWithSelectType(List<Room> newSortingRooms)
     {
-        sortingRooms = rooms.Where((element) =>
+        isRoomTypeSortON = true;
+        sortingRooms = newSortingRooms.Where((element) =>
             element.Type.ToLower().Contains(roomType.ToLower()))
         .ToList();
     }
 
-    private void GetRoomWithoutBooking()
+    private List<Room> GetRoomWithoutBooking(List<Room> newSortingRooms)
     {
         List<Room> list = new();
-        foreach (var room in rooms)
+        foreach (var room in newSortingRooms)
         {
             var temp = bookings.FirstOrDefault((element) => element.Room.Number == room.Number);
             if(temp != null)
             {
-                if (temp.DepartureDate < GetDate(chekInDate))
+                if (temp.DepartureDate < GetDate(DateTime.Now.Date.ToString("dd.MM.yyyy")))
                 {
                     list.Add(room);
                 }   
             }
             else list.Add(room);
         }
-        sortingRooms = list;
-
-        //bookings.Where((element) =>
-        //    element.DepartureDate >= GetDate(chekInDate) || )
-        //.ToList();
-
-        //for(int i = 0; i < list.Count; i++)
-        //{
-        //    if(sortingRooms[i] == list[i].Room)
-        //    {
-        //        if (list[i].DepartureDate < GetDate(chekInDate))
-        //        {
-        //            newList.Add(sortingRooms[i]);
-        //        }
-        //    }
-        //}
+        return list;
     }
 
-    private void GetRoomForPeopleCount()
+    private void GetRoomForPeopleCount(List<Room> newSortingRooms)
     {
-        sortingRooms = rooms.Where((element) =>
+        isClientCountSortON = true;
+        sortingRooms = newSortingRooms.Where((element) =>
             element.Capacity >= bookModel.AdaltCount + bookModel.ChildCount)
         .ToList();
     }
 
-    private void SearchingClientForSelect()
-    {
-        sortingClients = clients.Where((element) =>
-            element.ClientName.ToLower().Contains(nameClient.ToLower()))
-        .ToList();
-    }
-
-
-
-    private void SearchingForBook()
+    private void BookingSearch()
     {
         sortingBookings = bookings.Where((element) =>
             element.Client.ClientName.ToLower().Contains(search.ToLower()))
@@ -283,6 +334,13 @@
     private void OpenClientList()
     {
         clientsSearch = "block";
+    }
+
+    private void SearchingClientForSelect()
+    {
+        sortingClients = clients.Where((element) =>
+            element.ClientName.ToLower().Contains(nameClient.ToLower()))
+        .ToList();
     }
 
     private void SelectCleint(Client selectedClient)
@@ -298,9 +356,13 @@
         bookModel.AdaltCount = 0;
         bookModel.ChildCount = 0;
         roomType = string.Empty;
-        chekInDate = string.Empty; 
-        chekOutDate = string.Empty;
+        chekInDate = null;
+        chekOutDate = null;
         roomNumber = string.Empty;
+        isClientCountSortON = false;
+        isDateSortON = false;
+        isRoomTypeSortON = false;
+        clientsSearch = "none";
     }
 }
 
@@ -372,7 +434,7 @@
         margin-top: -40px;
     }
 
-    #inputBox input {
+        #inputBox input, .datePicker {
         background-color: transparent;
         border: 0;
         border-bottom: 1px solid #ced4da;
@@ -385,7 +447,7 @@
         width: 400px;
     }
 
-    #inputBox span, .typeList span {
+        #inputBox span, .typeList span {
         position: absolute;
         left: 45px;
         padding: 4px;
@@ -401,6 +463,8 @@
         outline: none;
     }
 
+    .datePicker:valid ~ #span,
+    .datePicker:focus ~ #span,
     .typeList select:valid ~ #span,
     .typeList select:focus ~ #span,
     #inputBox input:valid ~ #span,
@@ -434,7 +498,7 @@
     }
 
 
-    .button {
+    .button, .button1 {
         display: inline-block;
         border-radius: 4px;
         background-color: #0dcaf0;
@@ -449,29 +513,47 @@
         margin: 5px;
     }
 
-        .button span {
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            transition: 0.5s;
-        }
+    .button span, .button1 span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
 
-            .button span:after {
-                content: '\00bb';
-                position: absolute;
-                opacity: 0;
-                top: 0;
-                right: -30px;
-                transition: 0.5s;
-            }
+    .button span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -30px;
+        transition: 0.5s;
+    }
 
-        .button:hover span {
-            padding-right: 22px;
-        }
+    .button:hover span {
+        padding-right: 22px;
+    }
 
-            .button:hover span:after {
-                opacity: 1;
-                right: 0;
-            }
+    .button:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+
+    .button1 span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -30px;
+        transition: 0.5s;
+    }
+
+    .button1:hover span {
+        padding-right: 20px;
+    }
+
+    .button1:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
 
 </style>

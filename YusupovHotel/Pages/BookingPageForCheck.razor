@@ -1,0 +1,139 @@
+﻿@page "/bookingForCheck"
+
+@inject NavigationManager manager
+@inject SingletonServise servise
+@inject IJSRuntime js
+
+<div>
+    <div>
+        <div style="text-align: center; font-family: Georgia; font-size: 2em;">
+            <span>Бронь</span>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin: 2% 25% 5% 25%">
+        <div class="col-lg-8" style="width: 800px">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <EditForm Model="@booking" class="formRegistr" >
+        <DataAnnotationsValidator />
+                    <div class="row">
+                        <div class="col-sm-5">
+                        <p class="mb-0">Клиент</p>
+                        </div>
+                        <div class="col-sm-7">
+                            <InputText class="bookingInput" @bind-Value="@booking.Client.ClientName" disabled></InputText>
+                            <ValidationMessage For="@(()=>booking.Client.ClientName)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <p class="mb-0">Количество взрослых</p>
+                        </div>
+                        <div class="col-sm-7">
+                            <InputNumber class="bookingInput" @bind-Value="booking.AdaltCount"  disabled> </InputNumber>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                    <div class="col-sm-5">
+                        <p class="mb-0">Количество детей</p>
+                    </div>
+                    <div class="col-sm-7">
+                        <InputNumber class="bookingInput" @bind-Value="booking.ChildCount" disabled> </InputNumber>
+                </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <p class="mb-0">Тип номера</p>
+                    </div>
+                    <div class="col-sm-7">
+                            <InputText class="bookingInput" type="text" @bind-Value="booking.Room.Type" disabled> </InputText>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <p class="mb-0">Дата заезда</p>
+                    </div>
+                    <div class="col-sm-7">
+                        <InputDate class="bookingInput" @bind-Value="booking.ArrivalDate" disabled > </InputDate>
+                    </div>
+                </div>
+            <hr>
+            <div class="row">
+                <div class="col-sm-5">
+                    <p class="mb-0">Дата выезда</p>
+                </div>
+                <div class="col-sm-7">
+                        <InputDate class="bookingInput" @bind-Value="booking.DepartureDate" disabled> </InputDate>
+                </div>
+            </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-5">
+                <p class="mb-0">Номер</p>
+            </div>
+            <div class="col-sm-7">
+                    <InputNumber class="bookingInput" @bind-Value="@booking.Room.Number"  disabled></InputNumber>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-5">
+                <p class="mb-0">Итоговая сумма проживания</p>
+            </div>
+            <div class="col-sm-7">
+                    <InputNumber display class="bookingInput" @bind-Value="booking.TotalPrice" disabled> </InputNumber>
+            </div>
+        </div>
+                </EditForm>
+            </div>
+        </div>
+
+        </div>
+    </div>
+@code {
+    Booking booking;
+    protected override async void OnInitialized()
+    {
+        booking = servise.booking;
+    }
+}
+
+<style>
+
+    body {
+        background-color: #eeeeee
+    }
+
+    .vh-100 {
+        height: 96vh !important;
+    }
+    
+    input {
+        width: 98%;
+        outline: none!important;
+        border: 0;
+        border-bottom: 0.1px solid white;
+        height: 37px;
+        font-size: 16px;
+        margin-top: -2%;
+    }
+
+.section {
+    position: relative;
+    height: 100vh;
+}
+
+.section .section-center {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+</style>

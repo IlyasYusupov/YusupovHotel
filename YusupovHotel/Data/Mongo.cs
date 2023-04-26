@@ -132,6 +132,7 @@ namespace YusupovHotel.Data
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<Booking>("Bookings");
             var list = collection.Find(x => true).ToList();
+            list.Reverse();
             return list;
         }
 

@@ -49,7 +49,7 @@
         if (Mongo.FindUser(Email) != null && Mongo.FindUser(Email).Password ==Password)
         {
             servise.user = Mongo.FindUser(Email);
-            manager.NavigateTo("clients");
+            manager.NavigateTo("bookings");
         }
         else
         {

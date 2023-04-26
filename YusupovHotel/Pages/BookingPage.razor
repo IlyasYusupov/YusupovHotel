@@ -56,10 +56,10 @@
                 <hr>
                 <div class="row">
                     <div class="col-sm-5">
-                        <p class="mb-0">Дата заезда</p>
+                        <p class="mb-0">Период проживания</p>
                     </div>
                     <div class="col-sm-7">
-                        <InputDate class="bookingInput" @bind-Value="booking.ArrivalDate" disabled="@editing" > </InputDate>
+                        <DateRangePicker MinDate="DateTimeOffset.Now" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required">  </DateRangePicker>
                     </div>
                 </div>
             <hr>
@@ -114,13 +114,25 @@
     string Name;
     bool editing = true;
     string btnText = "Изменить";
+    DateTimeOffset? chekInDate;
+    DateTimeOffset? chekOutDate;
     protected override async void OnInitialized()
     {
-
         booking = servise.booking;
+        chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy"));
+        chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy"));
         client = booking.Client;
         room = booking.Room;
     }
+
+    private DateTime GetDate(string date)
+    {
+        int day = int.Parse(date.Split('.', ',')[0]);
+        int mounth = int.Parse(date.Split('.', ',')[1]);
+        int year = int.Parse(date.Split('.', ',')[2]);
+        return new DateTime(year, mounth, day);
+    }
+
     public void v()
     {
         booking = new Booking(booking.Room, booking.Client, booking.AdaltCount, booking.ChildCount, booking.ArrivalDate, booking.DepartureDate, (double)booking.TotalPrice);
