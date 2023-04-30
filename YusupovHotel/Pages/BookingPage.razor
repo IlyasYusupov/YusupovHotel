@@ -15,15 +15,20 @@
         <div class="col-lg-8" style="width: 800px">
             <div class="card mb-4">
                 <div class="card-body">
-                    <EditForm Model="@booking" class="formRegistr" OnValidSubmit="@Submit" >
+                <EditForm Model="@bookingModel" class="formRegistr" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
                     <div class="row">
                         <div class="col-sm-5">
                         <p class="mb-0">Клиент</p>
                         </div>
                         <div class="col-sm-7">
-                            <InputText class="bookingInput" @bind-Value="@booking.Client.ClientName" @onchange="v" disabled="@editing"></InputText>
-                            <ValidationMessage For="@(()=>booking.Client.ClientName)"></ValidationMessage>
+                            <input class="bookingInput" type="text" @bind="nameClient" disabled="@editing" @bind:event="oninput" @onfocus="OpenClientList" @onkeyup="@(() => Searcher("client"))">
+                            <div class="dropdownClients" style="display:@clientsSearch;">
+                                @foreach (var client in sortingClients)
+                                {
+                                    <a @onclick="() => SelectCleint(client)">@client.ClientName</a>
+                                }
+                            </div>
                         </div>
                     </div>
                     <hr>
@@ -32,7 +37,7 @@
                             <p class="mb-0">Количество взрослых</p>
                         </div>
                         <div class="col-sm-7">
-                            <InputNumber class="bookingInput" @bind-Value="booking.AdaltCount"  disabled="@editing"> </InputNumber>
+                            <InputText @bind-Value="adaltCount" @onfocusout="@(() => Sorter("clientCount"))" disabled="@editing" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                         </div>
                     </div>
                     <hr>
@@ -41,7 +46,7 @@
                         <p class="mb-0">Количество детей</p>
                     </div>
                     <div class="col-sm-7">
-                        <InputNumber class="bookingInput" @bind-Value="booking.ChildCount" disabled="@editing"> </InputNumber>
+                            <InputText @bind-Value="childCount" @onfocusout="@(() => Sorter("clientCount"))" disabled="@editing" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                 </div>
                 </div>
                 <hr>
@@ -50,7 +55,16 @@
                         <p class="mb-0">Тип номера</p>
                     </div>
                     <div class="col-sm-7">
-                            <InputText class="bookingInput" type="text" @bind-Value="booking.Room.Type" disabled="@editing"> </InputText>
+                            <InputSelect @bind-Value="roomType" @onclick="@(() => Sorter("roomType"))" required="required" disabled="@editing"
+                                         class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 400px;">
+                                <option selected disabled></option>
+                                <option value="Стандарт">Стандарт</option>
+                                <option value="Бизнес">Бизнес</option>
+                                <option value="Люкс одноместный">Люкс одноместный</option>
+                                <option value="Люкс однокомнатный">Люкс двухкомнатный</option>
+                                <option value="Люкс премиум">Люкс премиум</option>
+                            </InputSelect>
+                                
                     </div>
                 </div>
                 <hr>
@@ -59,25 +73,26 @@
                         <p class="mb-0">Период проживания</p>
                     </div>
                     <div class="col-sm-7">
-                        <DateRangePicker MinDate="DateTimeOffset.Now" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required">  </DateRangePicker>
+                            <DateRangePicker MinDate="DateTimeOffset.Now" @onfocusout="TotalPriceCalculate" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required" disabled="@editing">  </DateRangePicker>
                     </div>
                 </div>
-            <hr>
-            <div class="row">
-                <div class="col-sm-5">
-                    <p class="mb-0">Дата выезда</p>
-                </div>
-                <div class="col-sm-7">
-                        <InputDate class="bookingInput" @bind-Value="booking.DepartureDate" disabled="@editing"> </InputDate>
-                </div>
-            </div>
         <hr>
         <div class="row">
             <div class="col-sm-5">
                 <p class="mb-0">Номер</p>
             </div>
             <div class="col-sm-7">
-                    <InputNumber class="bookingInput" @bind-Value="@booking.Room.Number"  disabled="@editing"></InputNumber>
+                            <InputSelect @bind-Value="roomNumber" @onfocusout="TotalPriceCalculate" required="required" disabled="@editing"
+                                    class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 400px;">
+                        <option selected disabled></option>
+                        @if (sortingRooms != null)
+                        {
+                            @foreach (var room in sortingRooms)
+                            {
+                                <option value="@room.Number">@room.Number</option>
+                            }
+                        }
+                    </InputSelect>
             </div>
         </div>
         <hr>
@@ -86,13 +101,13 @@
                 <p class="mb-0">Итоговая сумма проживания</p>
             </div>
             <div class="col-sm-7">
-                    <InputNumber display class="bookingInput" @bind-Value="booking.TotalPrice" disabled="@editing"> </InputNumber>
+                    <InputNumber display class="bookingInput" @bind-Value="bookingModel.TotalPrice" disabled> </InputNumber>
             </div>
         </div>
             <hr>
             <div class="d-flex justify-content-end"  id="btnProfil">
                         <button type="button" style="margin-right: 1%;" hidden="@editing"
-                                class="btn btn-danger" @onclick=CancelСhanges>
+                                class="btn btn-danger" @onclick="CancelСhanges">
                             Отменить
                         </button>
                 <button type="submit"
@@ -107,35 +122,61 @@
         </div>
     </div>
 @code {
-    Client client;
-    Room room;
-    Booking booking;
+    Booking? bookingModel;
+    Booking? booking;
+    Client? client;
+    List<Booking> bookings = new List<Booking>();
+    List<Booking> sortingBookings = new List<Booking>();
+    List<Room> rooms = new List<Room>();
+    List<Room> sortingRooms = new List<Room>();
+    List<Client> clients = new List<Client>();
+    List<Client> sortingClients = new List<Client>();
+    bool isRoomTypeSortON = true;
+    bool isClientCountSortON = true;
+    string nameClient = "";
+    string adaltCount = "";
+    string childCount = "";
     bool wasSubmitted;
-    string Name;
     bool editing = true;
     string btnText = "Изменить";
+    string clientsSearch = "none";
+    string roomType = "";
+    int roomNumber;
     DateTimeOffset? chekInDate;
     DateTimeOffset? chekOutDate;
+
     protected override async void OnInitialized()
     {
-        booking = servise.booking;
-        chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy"));
-        chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy"));
-        client = booking.Client;
-        room = booking.Room;
+        booking = Mongo.FindBooking(servise.booking.Client);
+        chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
+        chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
+        bookingModel = servise.booking;
+        clients = Mongo.FindAllClient();
+        sortingClients = clients;
+        rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRooms(), bookings);
+        sortingRooms = rooms;
+        nameClient = booking.Client.ClientName;
+        adaltCount = booking.AdaltCount.ToString();
+        childCount = booking.ChildCount.ToString();
+        roomType = booking.Room.Type;
+        roomNumber = (int)bookingModel.Room.Number;
+        Sorter("roomType");
     }
 
-    private DateTime GetDate(string date)
+    private DateOnly GetDate(string date)
     {
         int day = int.Parse(date.Split('.', ',')[0]);
         int mounth = int.Parse(date.Split('.', ',')[1]);
         int year = int.Parse(date.Split('.', ',')[2]);
-        return new DateTime(year, mounth, day);
+        return new DateOnly(year, mounth, day);
     }
 
-    public void v()
+    private void TotalPriceCalculate()
     {
-        booking = new Booking(booking.Room, booking.Client, booking.AdaltCount, booking.ChildCount, booking.ArrivalDate, booking.DepartureDate, (double)booking.TotalPrice);
+        var arrivalDate = (GetDate(chekInDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
+        var departureDate = (GetDate(chekOutDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
+        var room = Mongo.GetRoom(roomNumber);
+        bookingModel.TotalPrice = (double)room.Cost * ((int)(departureDate - arrivalDate).TotalDays);
     }
 
     public void Editing()
@@ -144,29 +185,74 @@
         {
             case "Изменить":
                 editing = false;
+
                 btnText = "Сохранить";
                 break;
             case "Сохранить":
                 editing = true;
                 btnText = "Изменить";
-                Mongo.ReplaceBooking(booking.Client, booking);
+                var newBooking = new Booking();
+                Mongo.ReplaceBooking(bookingModel.Client, booking);
                 break;
         }
     }
 
-    private void CancelСhanges()
+    private void OpenClientList()
+    {
+        clientsSearch = "block";
+    }
+
+    public void SelectCleint(Client selectedClient)
+    {
+        clientsSearch = "none";
+        nameClient = selectedClient.ClientName;
+        client = selectedClient;
+    }
+
+    private void Sorter(string sorting)
+    {
+        switch (sorting)
+        {
+            case "roomType":
+                if (!isClientCountSortON) sortingRooms = SorterClass.GetRoomWithSelectType(rooms, ref isRoomTypeSortON, roomType);
+                else if (isClientCountSortON)
+                {
+                    sortingRooms = SorterClass.GetRoomWithSelectType(rooms, ref isRoomTypeSortON, roomType);
+                    sortingRooms = SorterClass.GetRoomForPeopleCount(sortingRooms, ref isClientCountSortON, adaltCount, childCount);
+                }
+                break;
+
+            case "clientCount":
+                if (!isRoomTypeSortON) sortingRooms = SorterClass.GetRoomForPeopleCount(rooms, ref isClientCountSortON, adaltCount, childCount);
+                else if (isRoomTypeSortON)
+                {
+                    sortingRooms = SorterClass.GetRoomForPeopleCount(rooms, ref isClientCountSortON, adaltCount, childCount);
+                    sortingRooms = SorterClass.GetRoomWithSelectType(sortingRooms, ref isRoomTypeSortON, roomType);
+                }
+                break;
+        }
+        roomNumber = 0;
+    }
+
+    private void Searcher(string search)
+    {
+        switch (search)
+        {
+            case "client":
+                sortingClients = SearcherClass.SearchingClientForSelect(clients, nameClient);
+                break;
+        }
+    }
+
+    private async void CancelСhanges()
     {
         editing = true;
         btnText = "Изменить";
-        booking.Client.ClientName += servise.booking.Client.ClientName;
-        booking.AdaltCount = 100000;
-        booking.ChildCount = servise.booking.ChildCount;
-        booking.Room.Type = servise.booking.Room.Type;
-        booking.ArrivalDate = servise.booking.ArrivalDate;
-        booking.DepartureDate = servise.booking.DepartureDate;
-        booking.Room.Number = servise.booking.Room.Number;
-        booking.TotalPrice = servise.booking.TotalPrice;
-
+        bookingModel = booking;
+        nameClient = booking.Client.ClientName;
+        roomNumber = (int)booking.Room.Number;
+        chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
+        chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
     }
 
     public void Submit()
@@ -209,4 +295,25 @@
     -webkit-transform: translateY(-50%);
     transform: translateY(-50%);
 }
+
+    .dropdownClients {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        margin-left: 0.3%;
+        width: 100%;
+        min-height: 30px;
+        max-height: 100px;
+    }
+
+        .dropdownClients a {
+            cursor: pointer;
+            width: 100%;
+            display: block;
+        }
+
+        .inputBoxClients input:valid ~ .dropdownClients,
+        .inputBoxClients input:focus ~ .dropdownClients,
+        .dropdownClients a:focus ~ .dropdownClients {
+            display: block;
+        }
 </style>

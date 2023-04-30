@@ -27,7 +27,7 @@ namespace YusupovHotel.Data
         public string FullName { get; set; }
 
         [Required(ErrorMessage = "Номер телефона не указан")]
-        [RegularExpression(@"^((\+7|7|8)\(([0-9]{3})\)-([0-9]){3}-([0-9]){2}-([0-9]){2})$", ErrorMessage = "Неверный формат номера")]
+        [RegularExpression(@"^((\+7|7|8) \(([0-9]{3})\) ([0-9]){3}-([0-9]){2}-([0-9]){2})$", ErrorMessage = "Неверный формат номера")]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Почтовый адресс не указан")]

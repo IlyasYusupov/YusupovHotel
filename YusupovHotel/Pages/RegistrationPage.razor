@@ -26,8 +26,9 @@
 
 
         <label for="username">Номер телефона</label>
-        <InputMask style="border-color: black"  @bind-Value="user.PhoneNumber"  data-mask="+7(000)-000-00-00" placeholder="+7(" />
+        <InputMask style="border-color: black"  @bind-Value="user.PhoneNumber"  data-mask="+7 (000) 000-00-00" placeholder="+7(" />
         <ValidationMessage For="() => user.PhoneNumber" />
+
 
         <label for="password">Пароль</label>
         <InputText class="textblocks" id="password" style="border-color: black" type="password" @bind-Value="user.Password"></InputText>

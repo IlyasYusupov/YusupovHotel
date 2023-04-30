@@ -17,26 +17,26 @@ namespace YusupovHotel.Data
             ChildCount = childCount;
         }
         public Booking( )
-        { }
+        {}
 
         [BsonId]
         [BsonIgnoreIfDefault]
         ObjectId _id;
 
-        [Required]
+
         public Room Room { get; set; }
-        [Required]
+
         public Client Client { get; set; }
-        [Required]
+
         public int AdaltCount { get; set; }
-        [Required]
+
         public int ChildCount { get; set; }
 
-        [Required]
+
         public DateOnly ArrivalDate { get; set; }
-        [Required]
+
         public DateOnly DepartureDate { get; set; }
-        [Required]
+
         public double? TotalPrice { get; set; }
     }
 

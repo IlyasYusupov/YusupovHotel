@@ -5,6 +5,7 @@
 @inject NavigationManager manager
 @inject SingletonServise servise
 @inject IWebHostEnvironment Environment
+@inject IJSRuntime js
 
 <section>
     <div class="modal fade" id="modalRegisterForm" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -95,7 +96,7 @@
                     </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                        <button class="btn btn-default btn-success" data-bs-dismiss="modal" type="submit">Добавить</button>
+                        <button class="btn btn-default btn-success" type="submit">Добавить</button>
             </div>
                 </EditForm>
         </div>
@@ -155,6 +156,7 @@
     {
         wasSubmitted = true;
         AddNewRoom();
+        js.InvokeVoidAsync("CloseModal");
     }
 
 

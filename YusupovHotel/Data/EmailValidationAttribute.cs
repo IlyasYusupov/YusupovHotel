@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using YusupovHotel.Data;
 
-namespace YusupovHotel.Shared
+namespace YusupovHotel.Data
 {
     public class EmailValidationAttribute : ValidationAttribute
     {

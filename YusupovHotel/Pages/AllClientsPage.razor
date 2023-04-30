@@ -38,14 +38,14 @@
                 <div class="md-form mb-5">
                     <i class="fas fa-phone prefix grey-text"></i>
                     <div id="inputBox">
-                        <InputMask class="fas fa-envelope prefix grey-text" type="text" required="required" @bind-Value="client.PhoneNumber" data-mask="+7(000)-000-00-00" />
+                        <InputMask class="fas fa-envelope prefix grey-text" type="text" required="required" @bind-Value="client.PhoneNumber" data-mask="+7 (000) 000-00-00" />
                         <span id="span">Номер телефона</span>
                         <span style="margin-top: -4px"><ValidationMessage For="() => client.PhoneNumber" /></span>
                     </div>
                 </div>
         </div>
             <div class="modal-footer d-flex justify-content-center">
-            <button class="btn btn-default btn-success" data-bs-dismiss="modal" type="submit">Добавить</button>
+            <button class="btn btn-default btn-success" type="submit">Добавить</button>
             </div>
                 </EditForm>
         </div>
@@ -101,6 +101,7 @@
     {
         wasSubmitted = true;
         AddNewClient();
+        js.InvokeVoidAsync("CloseModal");
     }
 
     private void Searching()

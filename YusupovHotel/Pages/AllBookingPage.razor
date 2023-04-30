@@ -14,14 +14,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="ClaerBookingForm">
                     </button>
                 </div>
-
                 <EditForm Model="@bookModel" class="formRegistr" OnValidSubmit="@Submit">
                     <DataAnnotationsValidator />
                     <div class="modal-body mx-3">
                     <div class="md-form mb-5">
                         <iconify-icon icon="material-symbols:person"></iconify-icon>
                         <div id="inputBox" class="inputBoxClients">
-                                <input class="fas fa-envelope prefix grey-text" type="text" @bind="nameClient" @bind:event="oninput" @onfocus="OpenClientList" @onkeyup="SearchingClientForSelect" required="required">
+                            <input class="fas fa-envelope prefix grey-text" type="text" @bind="nameClient" @bind:event="oninput"  @onfocus="OpenClientList" @onkeyup="@(() => Searcher("client"))" required="required">
                             <span id="span">Клиент</span>
                                 <div class="dropdownClients" style="display:@clientsSearch;">
                                 @foreach (var client in sortingClients)
@@ -34,14 +33,14 @@
                     <div class="md-form mb-5">
                         <iconify-icon icon="pepicons-pop:persons"></iconify-icon>
                         <div id="inputBox">
-                                <InputNumber @bind-Value="bookModel.AdaltCount" class="fas fa-envelope prefix grey-text" required="required" @onfocusout="@(() => Sorter("clientCount"))" />
+                                <InputText @bind-Value="adaltCount" class="fas fa-envelope prefix grey-text" required="required" @onfocusout="@(() => Sorter("clientCount"))" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                             <span id="span">Кол-во взрослых</span>
                         </div>
                     </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="pepicons-pop:persons" ></iconify-icon>
                         <div id="inputBox">
-                                <InputNumber @bind-Value="bookModel.ChildCount" class="fas fa-envelope prefix grey-text" @onfocusout="@(() => Sorter("clientCount"))" required="required" />
+                                <InputText @bind-Value="childCount" class="fas fa-envelope prefix grey-text" @onfocusout="@(() => Sorter("clientCount"))" required="required" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                             <span id="span">Кол-во детей</span>
                         </div>
                     </div>
@@ -77,7 +76,7 @@
                                     {
                                         @foreach (var room in sortingRooms)
                                         {
-                                            <option value="@room.Number">@room.Number</option>
+                                            <option value="@room.Number.ToString()">@room.Number</option>
                                         }
                                     }
                                 </InputSelect>
@@ -87,16 +86,16 @@
 
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
-                    <button class="btn btn-default btn-success" type="submit" data-bs-dismiss="modal" @onclick="Submit">Добавить</button>
+                    <button class="btn btn-default btn-success" type="submit"  >Добавить</button>
                     </div>
                     </EditForm>
             </div>
         </div>
         </div>
     <div class="appbar" style="margin: 20px 0 0 10%">
-        <input id="searching" class="sort" type="text" @bind="search" @bind:event="oninput" @onkeyup="BookingSearch" required="required" placeholder="Поиск">
+        <input id="searching" class="sort" type="text" @bind="searchBookByClientName" @bind:event="oninput" @onkeyup="@(() => Searcher("booking"))" required="required" placeholder="Поиск">
         <i id="searching" class="fas fa-search prefix grey-text"></i>
-        <button id="newBook"  class="btn btn-default btn-success" type="submit" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
+        <button id="newBook" class="btn btn-default btn-success" type="submit" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
             Забронировать
         </button>
     </div>
@@ -155,15 +154,15 @@
     Booking bookModel = new Booking();
     bool isRoomTypeSortON;
     bool isClientCountSortON;
-    bool isDateSortON;
     string clientsSearch = "none";
-    string search = "";
+    string searchBookByClientName = "";
     string nameClient = "";
     DateTimeOffset? chekInDate;
     DateTimeOffset? chekOutDate;
-    string date = "";
-    Client client;
-    string roomNumber;
+    Client? client;
+    string adaltCount = "";
+    string childCount = "";
+    string roomNumber = "";
     string roomType = "";
     bool wasSubmitted;
 
@@ -175,7 +174,7 @@
         sortingBookings = bookings;
         clients = Mongo.FindAllClient();
         sortingClients = clients;
-        rooms = GetRoomWithoutBooking(Mongo.GetAllRooms());
+        rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRooms(), bookings);
         sortingRooms = rooms;
     }
 
@@ -183,25 +182,25 @@
     {
         wasSubmitted = true;
         AddNewBook();
+        js.InvokeVoidAsync("CloseModal");
     }
-
-    private void NewBooking()
-    {
-        //servise.booking = newBooking;
-        //manager.NavigateTo("booking");
-    }
-
     private void AddNewBook()
     {
-        //var room = Mongo.GetRoom(int.Parse(roomNumber));
+        var room = Mongo.GetRoom(int.Parse(roomNumber));
         var arrivalDate = GetDate(chekInDate.ToString().Split(" ")[0]);
         var departureDate = GetDate(chekOutDate.ToString().Split(" ")[0]);
-        //var price = Convert.ToDouble(room.Cost) * int.Parse(((departureDate.Day - arrivalDate.Day)).ToString());
-        //var newBook = new Booking(room, client, (int)bookModel.AdaltCount, (int)bookModel.ChildCount, arrivalDate, departureDate, price);
-        //Mongo.AddBookingToDB(newBook);
-        //bookings.Add(newBook);
+        var price = TotalPriceCalculate(arrivalDate.ToDateTime(TimeOnly.MinValue), departureDate.ToDateTime(TimeOnly.MinValue), (double)room.Cost);
+        var newBook = new Booking(room, client, int.Parse(adaltCount), int.Parse(childCount), arrivalDate, departureDate, price);
+        Mongo.AddBookingToDB(newBook);
+        bookings.Insert(0, newBook);
         ClaerBookingForm();
-        BookingSearch();
+        sortingBookings = SearcherClass.BookingSearch(bookings, searchBookByClientName);
+    }
+
+    private double TotalPriceCalculate(DateTime arrivalDate, DateTime departureDate, double roomCost)
+    {
+        var totalPrice = roomCost * ((int)(departureDate - arrivalDate).TotalDays);
+        return totalPrice;
     }
 
     private DateOnly GetDate(string date)
@@ -224,143 +223,67 @@
         manager.NavigateTo("booking");
     }
 
-    private void Sorter(string sorting)
-    {
-        switch (sorting)
-        {
-            case "roomType":
-                if (!isClientCountSortON) GetRoomWithSelectType(rooms);
-                else if (isClientCountSortON)
-                {
-                    GetRoomWithSelectType(rooms);
-                    GetRoomForPeopleCount(sortingRooms);
-                }
-                //else if (!isClientCountSortON && isDateSortON)
-                //{
-                //    GetRoomWithSelectType(rooms);
-                //    GetRoomWithoutBooking(sortingRooms);
-                //}
-                //else if (isClientCountSortON && isDateSortON)
-                //{
-                //    GetRoomWithSelectType(rooms);
-                //    GetRoomForPeopleCount(sortingRooms);
-                //    GetRoomWithoutBooking(sortingRooms);
-                //}
-                break;
-
-            case "clientCount":
-                if (!isRoomTypeSortON) GetRoomForPeopleCount(rooms);
-                else if (isRoomTypeSortON)
-                {
-                    GetRoomForPeopleCount(rooms);
-                    GetRoomWithSelectType(sortingRooms);
-                }
-                //else if (!isRoomTypeSortON && isDateSortON)
-                //{
-                //    GetRoomForPeopleCount(rooms);
-                //    GetRoomWithoutBooking(sortingRooms);
-                //}
-                //else if (isRoomTypeSortON && isDateSortON)
-                //{
-                //    GetRoomForPeopleCount(rooms);
-                //    GetRoomWithSelectType(sortingRooms);
-                //    GetRoomWithoutBooking(sortingRooms);
-                //}
-                break;
-
-            case "date":
-                if (!isRoomTypeSortON) GetRoomWithoutBooking(rooms);
-                else if (isRoomTypeSortON)
-                {
-                    GetRoomWithoutBooking(rooms);
-                    GetRoomWithSelectType(sortingRooms);
-                }
-                //else if (!isRoomTypeSortON && isClientCountSortON)
-                //{
-                //    GetRoomWithoutBooking(rooms);
-                //    GetRoomForPeopleCount(sortingRooms);
-                //}
-                //else if (isRoomTypeSortON && isClientCountSortON)
-                //{
-                //    GetRoomWithoutBooking(rooms);
-                //    GetRoomWithSelectType(sortingRooms);
-                //    GetRoomForPeopleCount(sortingRooms);
-                //}
-                break;
-        }
-    }
-
-    private void GetRoomWithSelectType(List<Room> newSortingRooms)
-    {
-        isRoomTypeSortON = true;
-        sortingRooms = newSortingRooms.Where((element) =>
-            element.Type.ToLower().Contains(roomType.ToLower()))
-        .ToList();
-    }
-
-    private List<Room> GetRoomWithoutBooking(List<Room> newSortingRooms)
-    {
-        List<Room> list = new();
-        foreach (var room in newSortingRooms)
-        {
-            var temp = bookings.FirstOrDefault((element) => element.Room.Number == room.Number);
-            if(temp != null)
-            {
-                if (temp.DepartureDate < GetDate(DateTime.Now.Date.ToString("dd.MM.yyyy")))
-                {
-                    list.Add(room);
-                }   
-            }
-            else list.Add(room);
-        }
-        return list;
-    }
-
-    private void GetRoomForPeopleCount(List<Room> newSortingRooms)
-    {
-        isClientCountSortON = true;
-        sortingRooms = newSortingRooms.Where((element) =>
-            element.Capacity >= bookModel.AdaltCount + bookModel.ChildCount)
-        .ToList();
-    }
-
-    private void BookingSearch()
-    {
-        sortingBookings = bookings.Where((element) =>
-            element.Client.ClientName.ToLower().Contains(search.ToLower()))
-        .ToList();
-    }
-
     private void OpenClientList()
     {
         clientsSearch = "block";
     }
 
-    private void SearchingClientForSelect()
-    {
-        sortingClients = clients.Where((element) =>
-            element.ClientName.ToLower().Contains(nameClient.ToLower()))
-        .ToList();
-    }
-
-    private void SelectCleint(Client selectedClient)
+    public void SelectCleint(Client selectedClient)
     {
         clientsSearch = "none";
         nameClient = selectedClient.ClientName;
         client = selectedClient;
     }
 
+    private void Sorter(string sorting)
+    {
+        switch (sorting)
+        {
+            case "roomType":
+                if (!isClientCountSortON) sortingRooms = SorterClass.GetRoomWithSelectType(rooms, ref isRoomTypeSortON, roomType);
+                else if (isClientCountSortON)
+                {
+                    sortingRooms = SorterClass.GetRoomWithSelectType(rooms, ref isRoomTypeSortON, roomType);
+                    sortingRooms = SorterClass.GetRoomForPeopleCount(sortingRooms, ref isClientCountSortON, adaltCount, childCount);
+                }
+                break;
+
+            case "clientCount":
+                if (!isRoomTypeSortON) sortingRooms = SorterClass.GetRoomForPeopleCount(rooms, ref isClientCountSortON, adaltCount, childCount);
+                else if (isRoomTypeSortON)
+                {
+                    sortingRooms = SorterClass.GetRoomForPeopleCount(rooms, ref isClientCountSortON, adaltCount, childCount);
+                    sortingRooms = SorterClass.GetRoomWithSelectType(sortingRooms, ref isRoomTypeSortON, roomType);
+                }
+                break;
+        }
+    }
+
+    private void Searcher(string search)
+    {
+        switch (search)
+        {
+            case "booking":
+                sortingBookings = SearcherClass.BookingSearch(bookings, searchBookByClientName);
+                break;
+
+            case "client":
+                sortingClients = SearcherClass.SearchingClientForSelect(clients, nameClient);
+                break;
+        }
+    }
+
+
     private void ClaerBookingForm()
     {
         nameClient = string.Empty;
-        bookModel.AdaltCount = 0;
-        bookModel.ChildCount = 0;
+        adaltCount = string.Empty;
+        childCount = string.Empty; 
         roomType = string.Empty;
         chekInDate = null;
         chekOutDate = null;
         roomNumber = string.Empty;
         isClientCountSortON = false;
-        isDateSortON = false;
         isRoomTypeSortON = false;
         clientsSearch = "none";
     }
