@@ -55,8 +55,8 @@
                         <p class="mb-0">Тип номера</p>
                     </div>
                     <div class="col-sm-7">
-                            <InputSelect @bind-Value="roomType" @onclick="@(() => Sorter("roomType"))" required="required" disabled="@editing"
-                                         class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 400px;">
+                            <InputSelect @bind-Value="roomType"  @onclick="@(() => Sorter("roomType"))" required="required" disabled="@editing"
+                                         class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 100%;">
                                 <option selected disabled></option>
                                 <option value="Стандарт">Стандарт</option>
                                 <option value="Бизнес">Бизнес</option>
@@ -73,7 +73,7 @@
                         <p class="mb-0">Период проживания</p>
                     </div>
                     <div class="col-sm-7">
-                            <DateRangePicker MinDate="DateTimeOffset.Now" @onfocusout="TotalPriceCalculate" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required" disabled="@editing">  </DateRangePicker>
+                            <DateRangePicker MinDate="DateTimeOffset.Now" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required" disabled="@editing">  </DateRangePicker>
                     </div>
                 </div>
         <hr>
@@ -82,9 +82,9 @@
                 <p class="mb-0">Номер</p>
             </div>
             <div class="col-sm-7">
-                            <InputSelect @bind-Value="roomNumber" @onfocusout="TotalPriceCalculate" required="required" disabled="@editing"
-                                    class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 400px;">
-                        <option selected disabled></option>
+                            <InputSelect TValue="int" @bind-Value="roomNumber"  @onmouseout="@TotalPriceCalculate" required="required" disabled="@editing"
+                                         class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 100%;">
+                                
                         @if (sortingRooms != null)
                         {
                             @foreach (var room in sortingRooms)
@@ -121,7 +121,8 @@
 
         </div>
     </div>
-@code {
+
+@functions {
     Booking? bookingModel;
     Booking? booking;
     Client? client;
@@ -151,6 +152,7 @@
         chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
         chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
         bookingModel = servise.booking;
+        roomNumber = (int)bookingModel.Room.Number;
         clients = Mongo.FindAllClient();
         sortingClients = clients;
         rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRooms(), bookings);
@@ -159,7 +161,6 @@
         adaltCount = booking.AdaltCount.ToString();
         childCount = booking.ChildCount.ToString();
         roomType = booking.Room.Type;
-        roomNumber = (int)bookingModel.Room.Number;
         Sorter("roomType");
     }
 
@@ -170,14 +171,19 @@
         int year = int.Parse(date.Split('.', ',')[2]);
         return new DateOnly(year, mounth, day);
     }
-
+    
     private void TotalPriceCalculate()
     {
-        var arrivalDate = (GetDate(chekInDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
-        var departureDate = (GetDate(chekOutDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
-        var room = Mongo.GetRoom(roomNumber);
-        bookingModel.TotalPrice = (double)room.Cost * ((int)(departureDate - arrivalDate).TotalDays);
+        if (roomNumber != 0)
+        {
+            var arrivalDate = (GetDate(chekInDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
+            var departureDate = (GetDate(chekOutDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
+            var room = Mongo.GetRoom(roomNumber);
+            bookingModel.TotalPrice = (double)room.Cost * ((int)(departureDate - arrivalDate).TotalDays);
+            
+        }
     }
+    
 
     public void Editing()
     {
@@ -195,6 +201,7 @@
                 Mongo.ReplaceBooking(bookingModel.Client, booking);
                 break;
         }
+        roomNumber = new int();
     }
 
     private void OpenClientList()
@@ -231,7 +238,6 @@
                 }
                 break;
         }
-        roomNumber = 0;
     }
 
     private void Searcher(string search)
@@ -251,6 +257,7 @@
         bookingModel = booking;
         nameClient = booking.Client.ClientName;
         roomNumber = (int)booking.Room.Number;
+        roomType = booking.Room.Type;
         chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
         chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
     }

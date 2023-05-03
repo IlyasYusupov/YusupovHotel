@@ -106,11 +106,7 @@
 
     private void Searching()
     {
-        sortingClients = clients.Where((element) =>
-            element.ClientName.ToLower().Contains(search.ToLower())
-            || element.Email.ToLower().Contains(search.ToLower())
-            || element.PhoneNumber.ToLower().Contains(search.ToLower()))
-        .ToList();
+        sortingClients = SearcherClass.SearchingClient(clients, search);
     }
 
     private void AddNewClient()

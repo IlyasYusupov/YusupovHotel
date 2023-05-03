@@ -18,6 +18,14 @@
             return sortingClients;
         }
 
-
+        public static List<Client> SearchingClient(List<Client> clients, string search)
+        {
+            var sortingClients = clients.Where((element) =>
+                element.ClientName.ToLower().Contains(search.ToLower())
+                || element.Email.ToLower().Contains(search.ToLower())
+                || element.PhoneNumber.ToLower().Contains(search.ToLower()))
+            .ToList();
+            return sortingClients;
+        }
     }
 }
