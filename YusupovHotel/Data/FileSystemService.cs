@@ -19,13 +19,30 @@ namespace YusupovHotel.Data
             newRoom.photosUrl = new();
             for (int i = 0; i < newRoom.photos.Count; i++)
             {
-                newRoom.photos[i] = GetImages(Convert.ToBase64String(newRoom.photos[i]));
+                newRoom.photos[i] = GetImage(Convert.ToBase64String(newRoom.photos[i]));
                 newRoom.photosUrl.Add(string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(newRoom.photos[i])));
             }
             return newRoom;
         }
 
-        public static byte[] GetImages(string bas)
+        public static User SaveUserWithPhoto(byte[] fileBytes, User user)
+        {
+            user.Photo = fileBytes;
+            Mongo.ReplaceUser(user.Email, user);
+            GetUserWithPhoto(user);
+            return user;
+        }
+
+        public static User GetUserWithPhoto(User user)
+        {
+            var newUser = Mongo.FindUser(user.Email);
+            newUser.PhotoUrl = null;
+            newUser.Photo = GetImage(Convert.ToBase64String(newUser.Photo));
+            newUser.PhotoUrl = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(newUser.Photo));
+            return newUser;
+        }
+
+        public static byte[] GetImage(string bas)
         {
             byte[] bytes = null;
             if (!string.IsNullOrEmpty(bas))

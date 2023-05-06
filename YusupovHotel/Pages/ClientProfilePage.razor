@@ -5,81 +5,121 @@
 @inject NavigationManager manager
 @inject SingletonServise servise
 
-<section style="background-color: #eee;">
-    <div class="row">
-        <div class="col-lg-4" style="height: 350px">
-            <div class="card mb-4">
-                <div class="card-body text-center" style="height: 330px">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-                         class="rounded-circle img-fluid" style="width: 200px;">
-                    <div class="d-flex justify-content-center mb-2">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-body">
+<section>
+    <div class="row" style="margin: 5% 20%">
+        <div class="card mb-4" style="display: flex!important">
+            <EditForm Model="@client" class="formRegistr" OnValidSubmit="@Submit">
+                <DataAnnotationsValidator />
+                    <div class="card-body" style="margin-top:15px;">
                         <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Full name</p>
+                            <div class="col-sm-5">
+                                <p class="mb-0">Фамилия, Имя, Отчество</p>
                             </div>
-                            <div class="col-sm-9">
-                            <p class="text-muted mb-0"> @client.ClientName </p>
+                            <div class="col-sm-6">
+                            <InputText @bind-Value="@client.ClientName" disabled="@disabled"></InputText>
+                            <ValidationMessage For="@(()=>client.ClientName)" class="invalidMasseg"></ValidationMessage>
                             </div>
                         </div>
                         <hr>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <p class="mb-0">Email</p>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <p class="mb-0">Email</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <InputText @bind-Value="@client.Email" disabled="@disabled"></InputText>
+                                <ValidationMessage class="invalidMasseg" For="@(()=>client.Email)"></ValidationMessage>
+                            </div>
                         </div>
-                        <div class="col-sm-9">
-                            <p class="text-muted mb-0">@client.Email</p>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <p class="mb-0">Номер телефона</p>
+                            </div>
+                            <div class="col-sm-6">
+                            <InputMask disabled="@disabled" @bind-Value="client.PhoneNumber" data-mask="+7 (000) 000-00-00" placeholder="+7(" />
+                            <ValidationMessage class="invalidMasseg" For="@(()=>client.PhoneNumber)"></ValidationMessage>
+                            </div>
                         </div>
+                        <hr>
                     </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <p class="mb-0">Phone number</p>
-                        </div>
-                        <div class="col-sm-9">
-                            <p class="text-muted mb-0">@client.PhoneNumber</p>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-end" id="btnProfil" style="margin-bottom: 15px;">
+                    <button type="button" hidden="@disabled" style="margin-right: 1%;"
+                            class="btn btn-danger" @onclick=CanselChanges>
+                        Отмена
+                    </button>
+                    <button type="button"
+                            class="btn btn-success" @onclick=Editing>
+                        @btnText
+                    </button>
                 </div>
-            </div>
-            <div class="d-flex justify-content-center" id="btnProfil">
-                <button type="button"
-                        class="btn btn-success" @onclick=Editing>
-                    Editing
-                </button>
+            </EditForm>
             </div>
         </div>
-    </div>
-
 </section>
 
 @code {
     private Client client;
+    string btnText = "Изменить";
+    bool wasSubmitted;
+    bool disabled = true;
+
     protected override void OnInitialized()
     {
         js.InvokeVoidAsync("ChangePanelsState");
         client = servise.client;
     }
 
-    private void Loaded()
+    public void Submit()
     {
-        
+        wasSubmitted = true;
+        Editing();
     }
 
-    private void LogOut()
+    public void Editing()
     {
-        //servise.SetUser(null);
-        //manager.NavigateTo("authorization");
+        switch (btnText)
+        {
+            case "Изменить":
+                disabled = false;
+                btnText = "Сохранить";
+                break;
+            case "Сохранить":
+                disabled = true;
+                btnText = "Изменить";
+                break;
+        }
     }
 
-    private void Editing()
+    private void CanselChanges()
     {
-        manager.NavigateTo("editing");
+        disabled = true;
+        btnText = "Изменить";
+        client = Mongo.FindClient(servise.client.Email);
     }
 }
+
+<style>
+    body {
+        background-color: #eeeeee;
+    }
+
+input {
+    width: 98%;
+    outline: none !important;
+    border: 0;
+    border-bottom: 0.1px solid white;
+    height: 37px;
+    font-size: 16px;
+    margin-top: -2%;
+    background-color: white;
+}
+
+.invalidMasseg {
+    pointer-events: none;
+    font-size: 0.5em;
+    text-transform: uppercase;
+    transition: 0.5s;
+    margin-top: 25px;
+    margin-left: 24%;
+}
+</style>

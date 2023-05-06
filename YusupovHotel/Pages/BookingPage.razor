@@ -22,7 +22,7 @@
                         <p class="mb-0">Клиент</p>
                         </div>
                         <div class="col-sm-7">
-                            <input class="bookingInput" type="text" @bind="nameClient" disabled="@editing" @bind:event="oninput" @onfocus="OpenClientList" @onkeyup="@(() => Searcher("client"))">
+                            <input class="bookingInput" type="text" @bind="nameClient" disabled="@disabled" @bind:event="oninput" @onfocus="OpenClientList" @onkeyup="@(() => Searcher("client"))">
                             <div class="dropdownClients" style="display:@clientsSearch;">
                                 @foreach (var client in sortingClients)
                                 {
@@ -37,7 +37,7 @@
                             <p class="mb-0">Количество взрослых</p>
                         </div>
                         <div class="col-sm-7">
-                            <InputText @bind-Value="adaltCount" @onfocusout="@(() => Sorter("clientCount"))" disabled="@editing" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
+                            <InputText @bind-Value="adaltCount" @onfocusout="@(() => Sorter("clientCount"))" disabled="@disabled" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                         </div>
                     </div>
                     <hr>
@@ -46,7 +46,7 @@
                         <p class="mb-0">Количество детей</p>
                     </div>
                     <div class="col-sm-7">
-                            <InputText @bind-Value="childCount" @onfocusout="@(() => Sorter("clientCount"))" disabled="@editing" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
+                            <InputText @bind-Value="childCount" @onfocusout="@(() => Sorter("clientCount"))" disabled="@disabled" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                 </div>
                 </div>
                 <hr>
@@ -55,7 +55,7 @@
                         <p class="mb-0">Тип номера</p>
                     </div>
                     <div class="col-sm-7">
-                            <InputSelect @bind-Value="roomType"  @onclick="@(() => Sorter("roomType"))" required="required" disabled="@editing"
+                            <InputSelect @bind-Value="roomType"  @onclick="@(() => Sorter("roomType"))" required="required" disabled="@disabled"
                                          class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 100%;">
                                 <option selected disabled></option>
                                 <option value="Стандарт">Стандарт</option>
@@ -73,7 +73,7 @@
                         <p class="mb-0">Период проживания</p>
                     </div>
                     <div class="col-sm-7">
-                            <DateRangePicker MinDate="DateTimeOffset.Now" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required" disabled="@editing">  </DateRangePicker>
+                            <DateRangePicker MinDate="DateTimeOffset.Now" @bind-StartDate="chekInDate" @bind-EndDate="chekOutDate" class="datePicker" required="required" disabled="@disabled">  </DateRangePicker>
                     </div>
                 </div>
         <hr>
@@ -82,7 +82,7 @@
                 <p class="mb-0">Номер</p>
             </div>
             <div class="col-sm-7">
-                            <InputSelect TValue="int" @bind-Value="roomNumber"  @onmouseout="@TotalPriceCalculate" required="required" disabled="@editing"
+                            <InputSelect TValue="int" @bind-Value="roomNumber"  @onmouseout="@TotalPriceCalculate" required="required" disabled="@disabled"
                                          class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 100%;">
                                 
                         @if (sortingRooms != null)
@@ -106,10 +106,10 @@
         </div>
             <hr>
             <div class="d-flex justify-content-end"  id="btnProfil">
-                        <button type="button" style="margin-right: 1%;" hidden="@editing"
-                                class="btn btn-danger" @onclick="CancelСhanges">
-                            Отменить
-                        </button>
+                <button type="button" style="margin-right: 1%;" hidden="@disabled"
+                        class="btn btn-danger" @onclick="CancelСhanges">
+                    Отменить
+                </button>
                 <button type="submit"
                                 class="btn btn-success">
                     @btnText
@@ -138,7 +138,7 @@
     string adaltCount = "";
     string childCount = "";
     bool wasSubmitted;
-    bool editing = true;
+    bool disabled = true;
     string btnText = "Изменить";
     string clientsSearch = "none";
     string roomType = "";
@@ -190,12 +190,12 @@
         switch (btnText)
         {
             case "Изменить":
-                editing = false;
+                disabled = false;
 
                 btnText = "Сохранить";
                 break;
             case "Сохранить":
-                editing = true;
+                disabled = true;
                 btnText = "Изменить";
                 var newBooking = new Booking();
                 Mongo.ReplaceBooking(bookingModel.Client, booking);
@@ -252,7 +252,7 @@
 
     private async void CancelСhanges()
     {
-        editing = true;
+        disabled = true;
         btnText = "Изменить";
         bookingModel = booking;
         nameClient = booking.Client.ClientName;

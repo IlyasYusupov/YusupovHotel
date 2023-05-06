@@ -16,6 +16,7 @@ namespace YusupovHotel.Data
             Email = email;
             Password = password;
             ConfirmPassword = confirmPassword;
+            
         }
 
         [BsonId]
@@ -46,5 +47,10 @@ namespace YusupovHotel.Data
         [Compare("Password", ErrorMessage = "Пароль не сходиться!")]
         public string ConfirmPassword { get; set; }
 
+        [BsonIgnoreIfNull]
+        public byte[] Photo { get; set; }
+
+        [BsonIgnoreIfNull]
+        public string PhotoUrl { get; set; }
     }
 }

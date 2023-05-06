@@ -1,182 +1,228 @@
 ﻿@page "/employeeProfile"
 
 <PageTitle>Profile</PageTitle>
+@inject IJSRuntime js
+@inject NavigationManager manager
+@inject SingletonServise servise
+@inject IWebHostEnvironment Environment
+@inject IConfiguration config
 
+<section>
+    <div class="row" style="margin: 5% 20%">
+        <div class="card mb-4" style="display: flex!important">
+                <EditForm Model="@user" class="formRegistr" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <div style="display: flex">
+                <div class="personal-image">
+                    <label class="label" style="margin-top: 20px">
+                            <BlazorInputFile.InputFile OnChange="@LoadFiles" id="inputimage" class="form-control" multiple accept=".png,.jpg,.jpeg" disabled="@disabled" />
+                    <figure class="personal-figure">
+                            <img src="@imgSrc" class="personal-avatar" alt="avatar">
+                        <figcaption class="personal-figcaption" hidden="@disabled">
+                        <img src="https://raw.githubusercontent.com/ThiagoLuizNunes/angular-boilerplate/master/src/assets/imgs/camera-white.png">
+                        </figcaption>
+                    </figure>
+                    </label>
+                    </div>
 
+                <div class="card-body" style="margin-top:15px;">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <p class="mb-0">Фамилия, Имя, Отчество</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <InputText @bind-Value="@user.FullName" disabled="@disabled"></InputText>
+                                <ValidationMessage For="@(()=>user.FullName)" class="invalidMasseg"></ValidationMessage>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <p class="mb-0">Email</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <InputText @bind-Value="@user.Email" disabled="@disabled"></InputText>
+                            <ValidationMessage class="invalidMasseg" For="@(()=>user.Email)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <p class="mb-0">Номер телефона</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <InputMask disabled="@disabled" @bind-Value="user.PhoneNumber" data-mask="+7 (000) 000-00-00" placeholder="+7(" />
+                               <ValidationMessage class="invalidMasseg" For="@(()=>user.PhoneNumber)"></ValidationMessage>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end" id="btnProfil" style="margin-bottom: 15px;">
+                    <button type="button" hidden="@disabled" style="margin-right: 1%;"
+                        class="btn btn-danger" @onclick=CanselChanges>
+                        Отмена
+                </button>
+                <button type="submit"
+                        class="btn btn-success" @onclick=Editing>
+                        @btnText
+                </button>
+            </div>
+            </EditForm>
+        </div>
+        </div>
+</section>
 
-
-@code{
-    string nameClient = "";
-    List<Client> clients = new List<Client>();
-    List<Client> sortingClients = new List<Client>();
+@code {
+    string defaultImgSrc = $"data:image/jpeg;base64,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";
+    string imgSrc;
+    IFileListEntry? file;
+    byte[]? fileBytes;
+    string inputFileError = "";
+    User? user;
+    string btnText = "Изменить";
+    bool wasSubmitted;
+    bool disabled = true;
 
     protected override void OnInitialized()
     {
-        clients = Mongo.FindAllClient();
-        sortingClients = clients;
+        js.InvokeVoidAsync("ChangePanelsState");
+        user = servise.user;
+        if (user.Photo != null)
+        {
+            user = FileSystemService.GetUserWithPhoto(user);
+            imgSrc = user.PhotoUrl;
+        }
+        else imgSrc = defaultImgSrc;
     }
 
-    private void Searching()
+    public void Submit()
     {
-        sortingClients = clients.Where((element) =>
-            element.ClientName.ToLower().Contains(nameClient.ToLower()))
-        .ToList();
+        wasSubmitted = true;
+        Editing();
     }
 
-    private void GetCleint(Client client)
+    public void Editing()
     {
-        nameClient = client.ClientName;
+        switch (btnText)
+        {
+            case "Изменить":
+                disabled = false;
+                btnText = "Сохранить";
+                break;
+            case "Сохранить":
+                disabled = true;
+                btnText = "Изменить";
+                FileSystemService.SaveUserWithPhoto(fileBytes, user);
+                break;
+        }
     }
 
+    private async Task LoadFiles(IFileListEntry[] files)
+    {
+        if (files.Count() > 0)
+        {
+            inputFileError = "";
+            file = files.FirstOrDefault();
+            using (var stream = new MemoryStream())
+            {
+                await file.Data.CopyToAsync(stream);
+                fileBytes = (stream.ToArray());
+                var images = FileSystemService.GetImage(Convert.ToBase64String(fileBytes));
+                imgSrc = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(images));
+            }            
+        }
+    }
 
+    private void CanselChanges()
+    {
+        disabled = true;
+        btnText = "Изменить";
+        user = Mongo.FindUser(servise.user.Email);
+        if (user.Photo != null)
+        {
+            user = FileSystemService.GetUserWithPhoto(user);
+            imgSrc = user.PhotoUrl;
+        }
+        else imgSrc = defaultImgSrc;
+    }
 }
 
 <style>
-
-    #span {
-        /*margin-top: -30px;*/
+    body {
+        background-color: #eeeeee;
     }
 
-  #inputBox {
-        position: relative;
-        margin-top: -40px;
-    }
-
-    #inputBox input {
-        background-color: transparent;
+    input {
+        width: 98%;
+        outline: none !important;
         border: 0;
-        border-bottom: 1px solid #ced4da;
-        border-radius: 0;
-        outline: none;
-        color: black;
-        font-size: 14px;
-        margin-left: 2.6rem;
-        height: 30px;
-        width: 400px;
+        border-bottom: 0.1px solid white;
+        height: 37px;
+        font-size: 16px;
+        margin-top: -2%;
+        background-color: white;
     }
 
-    #inputBox span, .typeList span {
-        position: absolute;
-        left: 45px;
-        padding: 4px;
+    .invalidMasseg {
+        
         pointer-events: none;
-        font-size: 0.8em;
-        color: gray;
+        font-size: 0.5em;
         text-transform: uppercase;
         transition: 0.5s;
+        margin-top: 25px;
+        margin-left: 24%;
     }
 
-    .typeList select:active {
-        border-color: #ced4da;
-        outline: none;
+    .personal-image {
+        text-align: center;
+        height:250px;
+        width: 300px;
     }
 
-    .typeList select:valid ~ #span,
-    .typeList select:focus ~ #span,
-    #inputBox input:valid ~ #span,
-    #inputBox input:focus ~ #span {
-        color: grey;
-        transform: translateX(-1px) translateY(-15px);
-        font-size: 0.6em;
-        background: none;
-        letter-spacing: 0.2em;
-    }
-
-/* Поле поиска, когда он получает фокус/нажал на */
-
-/* Контейнер div - необходим для размещения выпадающего содержимого */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* Выпадающее содержимое (скрыто по умолчанию) */
-.dropdown-content {
-  position: absolute;
-  background-color: #f6f6f6;
-  border: 1px solid #ddd;
-  z-index: 1;
-}
-
-/* Ссылки внутри выпадающего списка */
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Изменение цвета выпадающих ссылок при наведении курсора */
-.dropdown-content a:hover {background-color: #f1f1f1}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.custom-btn {
-    width: 130px;
-    height: 40px;
-    color: #fff;
-    border-radius: 1px 25px 25px 25px;
-    padding: 12px 38px 12px 38px;
-    font-family: 'Lato', sans-serif;
-    font-weight: 500;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    display: inline-block;
-    border-color: none;
-    outline: none;
-}
-
-.btn-15 {
-    background: #363635;
-        
-    border: none;
-    z-index: 1;
-}
-
-.btn-15:after {
-    position: absolute;
-    content: "";
-    width: 0;
-    border-color: none;
-    height: 100%;
-    top: 0;
-    right: 0;
-    z-index: -1;
-    background-color: #badbd5;
-    border-radius: 1px 25px 25px 25px;
-            
-    transition: all 0.3s ease;
-}
-
-        .btn-15:hover {
-            color: #fff;
+        .personal-image input[type="file"] {
+            display: none;
         }
 
-            .btn-15:hover:after {
-                left: 0;
-                width: 100%;
-            }
+    .personal-figure {
+        position: relative;
+        width: 220px;
+        height: 200px;
+    }
 
-        .btn-15:active {
-            top: 2px;
+    .personal-avatar {
+        cursor: pointer;
+        width: 220px;
+        height: 200px;
+        box-sizing: border-box;
+        border: 2px solid transparent;
+        box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.2);
+        transition: all ease-in-out .3s;
+    }
+
+        .personal-avatar:hover {
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
         }
 
+    .personal-figcaption {
+        cursor: pointer;
+        position: absolute;
+        top: 0px;
+        width: inherit;
+        height: inherit;
+        opacity: 0;
+        background-color: rgba(0, 0, 0, 0);
+        transition: all ease-in-out .3s;
+    }
+
+        .personal-figcaption:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, .5);
+        }
+
+        .personal-figcaption > img {
+            margin-top: 70px;
+            width: 50px;
+            height: 50px;
+        }
 </style>
-
-
-
-@inject NavigationManager manager
-@inject SingletonServise servise

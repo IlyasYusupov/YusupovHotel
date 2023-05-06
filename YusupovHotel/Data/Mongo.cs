@@ -61,7 +61,7 @@ namespace YusupovHotel.Data
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
-            var collection = database.GetCollection<User>("User");
+            var collection = database.GetCollection<User>("Users");
             collection.ReplaceOne(z => z.Email == email, user);
         }
 
