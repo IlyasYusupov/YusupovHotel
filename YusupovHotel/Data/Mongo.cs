@@ -1,5 +1,4 @@
 ﻿using MongoDB.Driver;
-using System.Collections.Generic;
 
 namespace YusupovHotel.Data
 {
@@ -13,12 +12,19 @@ namespace YusupovHotel.Data
             collection.InsertOne(user);
             
         }
-
-        public static void AddRoomToDB(Room room)
+        public static void AddRoomTypeToDB(RoomType room)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
-            var collection = database.GetCollection<Room>("Rooms");
+            var collection = database.GetCollection<RoomType>("RoomTypes");
+            collection.InsertOne(room);
+        }
+
+        public static void AddRoomToDB(Rooms room)
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("HotelBase");
+            var collection = database.GetCollection<Rooms>("Rooms");
             collection.InsertOne(room);
         }
 
@@ -65,30 +71,56 @@ namespace YusupovHotel.Data
             collection.ReplaceOne(z => z.Email == email, user);
         }
 
-        public static Room GetRoom(int number)
+        public static RoomType GetRoomType(string type)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
-            var collection = database.GetCollection<Room>("Rooms");
-            var one = collection.Find(x => x.Number == number).FirstOrDefault();
+            var collection = database.GetCollection<RoomType>("RoomTypes");
+            var one = collection.Find(x => x.Type == type).FirstOrDefault();
             return one;
         }
 
-        public static List<Room> GetAllRooms()
+        public static List<RoomType> GetAllRoomTypes()
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
-            var collection = database.GetCollection<Room>("Rooms");
+            var collection = database.GetCollection<RoomType>("RoomTypes");
             var list = collection.Find(x => true).ToList();
             return list;
         }
 
-        public static void ReplaceRoom(int number, Room room)
+        public static void ReplaceRoomType(string type, RoomType room)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
-            var collection = database.GetCollection<Room>("Rooms");
-            collection.ReplaceOne(z => z.Number == number, room);
+            var collection = database.GetCollection<RoomType>("RoomTypes");
+            collection.ReplaceOne(z => z.Type == type, room);
+        }
+
+        public static Rooms GetRoom(int Number)
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("HotelBase");
+            var collection = database.GetCollection<Rooms>("Rooms");
+            var one = collection.Find(x => x.RoomNumber == Number).FirstOrDefault();
+            return one;
+        }
+
+        public static List<Rooms> GetAllRoom()
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("HotelBase");
+            var collection = database.GetCollection<Rooms>("Rooms");
+            var list = collection.Find(x => true).ToList();
+            return list;
+        }
+
+        public static void ReplaceRoom(int Number, Rooms room)
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("HotelBase");
+            var collection = database.GetCollection<Rooms>("Rooms");
+            collection.ReplaceOne(z => z.RoomNumber == Number, room);
         }
 
         public static Client FindClient(string email)
@@ -117,12 +149,12 @@ namespace YusupovHotel.Data
             collection.ReplaceOne(z => z.Email == email, newClient);
         }
 
-        public static Booking FindBooking(Client currenrClient)
+        public static Booking FindBooking(Client currenrClient, DateOnly arrivalDate, DateOnly departureDate)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<Booking>("Bookings");
-            var one = collection.Find(x => x.Client == currenrClient).FirstOrDefault();
+            var one = collection.Find(x => x.Client == currenrClient && x.ArrivalDate == arrivalDate && x.DepartureDate == departureDate).FirstOrDefault();
             return one;
         }
 
@@ -136,12 +168,12 @@ namespace YusupovHotel.Data
             return list;
         }
 
-        public static void ReplaceBooking(Client currenrClient, Booking newBooking)
+        public static void ReplaceBooking(Client currenrClient, DateOnly arrivalDate, DateOnly departureDate, Booking newBooking)
         {
             var client = new MongoClient();
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<Booking>("Bookings");
-            collection.ReplaceOne(z => z.Client == currenrClient, newBooking);
+            collection.ReplaceOne(x => x.Client == currenrClient && x.ArrivalDate == arrivalDate && x.DepartureDate == departureDate, newBooking);
         }
     }
 }

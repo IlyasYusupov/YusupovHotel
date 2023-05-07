@@ -15,21 +15,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick=Clear>
                 </button>
             </div>
-             <EditForm Model="@roomModel" class="formRegistr" OnValidSubmit="@Submit">
+             <EditForm Model="@roomTypeModel" class="formRegistr" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
         <div class="modal-body mx-3">
                 <div class="md-form mb-5">
-                        <iconify-icon icon="tabler:number"></iconify-icon>
-                    <div id="inputBox">
-                        <InputNumber TValue="int?" class="fas fa-envelope prefix grey-text" required="required" @bind-Value="roomModel.Number" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
-                        <span id="span">Номер комнаты</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Number" /></span>
-                    </div>
-                </div>
-                <div class="md-form mb-5">
                         <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
                         <div class="typeList" >
-                        <InputSelect @bind-Value="@roomModel.Type" required="required"
+                        <InputSelect @bind-Value="@roomTypeModel.Type" required="required"
                             class="dropdown" style="outline:none; outline-style:none">
                             <option selected disabled></option>
                             <option value="Стандарт">Стандарт</option>
@@ -39,38 +31,38 @@
                             <option value="Люкс премиум">Люкс премиум</option>
                         </InputSelect>
                         <span id="span">Тип номера</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Type" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Type" /></span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
                     <iconify-icon icon="pepicons-pop:persons"></iconify-icon>
                     <div id="inputBox">
-                        <InputNumber TValue="int?" class="fas fa-envelope prefix grey-text" required="required" @bind-Value="roomModel.Capacity" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
+                        <InputNumber TValue="int?" class="fas fa-envelope prefix grey-text" required="required" @bind-Value="roomTypeModel.Capacity" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                         <span id="span">Вместимость</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Capacity" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Capacity" /></span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
                         <iconify-icon icon="bx:area"></iconify-icon>
                     <div id="inputBox">
-                        <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomModel.Area"  />
+                        <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomTypeModel.Area"  />
                         <span id="span">Площадь</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Area" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Area" /></span>
                     </div>
                 </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
                         <div id="inputBox">
-                            <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomModel.Cost" />
+                            <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomTypeModel.Cost" />
                             <span id="span">Цена за ночь</span>
-                            <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Cost" /></span>
+                            <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Cost" /></span>
                         </div>
                     </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="mdi:text-box"></iconify-icon>
                         <div id="inputBox">
                             <div class="description">
-                                <InputTextArea class="fas fa-envelope prefix grey-text" style="font-size: 14px;" type="text" @bind-Value="roomModel.Description" required="required" rows="4" />
+                                <InputTextArea class="fas fa-envelope prefix grey-text" style="font-size: 14px;" type="text" @bind-Value="roomTypeModel.Description" required="required" rows="4" />
                                 <span id="span" style="margin-top: -105px; background-color: white">Описание</span>
                             </div>
                         </div>
@@ -103,25 +95,25 @@
 
 <div>
     <div style="text-align: center; font-family: Georgia; font-size: 2em;">
-        <span>@roomModel.Type</span>
+        <span>@roomTypeModel.Type</span>
         <button id="buttonAdd"  class="button" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
                 <iconify-icon icon="material-symbols:edit"></iconify-icon>
         </button>
     </div>
 <div class="grid-gallery">
     <div class="grid-item">
-                <a href="@roomModel.photosUrl[0]" data-lightbox="gridImage">
-                    <img src="@roomModel.photosUrl[0]" />
+                <a href="@roomTypeModel.photosUrl[0]" data-lightbox="gridImage">
+                    <img src="@roomTypeModel.photosUrl[0]" />
         </a>
     </div>
     <div class="grid-item">
-                <a href="@roomModel.photosUrl[1]" data-lightbox="gridImage">
-                    <img src="@roomModel.photosUrl[1]" />
+                <a href="@roomTypeModel.photosUrl[1]" data-lightbox="gridImage">
+                    <img src="@roomTypeModel.photosUrl[1]" />
         </a>
     </div>
     <div class="grid-item">
-                <a href="@roomModel.photosUrl[2]" data-lightbox="gridImage">
-                    <img src="@roomModel.photosUrl[2]" />
+                <a href="@roomTypeModel.photosUrl[2]" data-lightbox="gridImage">
+                    <img src="@roomTypeModel.photosUrl[2]" />
         </a>
     </div>
 </div>
@@ -129,15 +121,15 @@
     <div style="font-size: 20px">
             <div >
                 <iconify-icon icon="bx:area"></iconify-icon>
-                    @roomModel.Area м <sup>2</sup>
+                    @roomTypeModel.Area м <sup>2</sup>
             </div>
             <div style="margin-top: -30px; margin-left: 176px">
                 <iconify-icon icon="pepicons-pop:persons" ></iconify-icon>
-                    @roomModel.Capacity
+                    @roomTypeModel.Capacity
                 </div>
         <div style="margin-top: -30px; margin-left: 300px">
                 <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
-                    @roomModel.Cost р
+                    @roomTypeModel.Cost р
                 </div>
         </div>
     </div>
@@ -207,14 +199,14 @@
         </div>
         <div style="width: 60%; margin-left: 15%; font-size: 17px; padding: 1rem 1rem 2rem 1rem">
             <div style="margin-left:18px">
-            @roomModel.Description
+            @roomTypeModel.Description
             </div>
         </div>
 </section>
 
 @code {
-    List<Room> rooms = new List<Room>();
-    Room roomModel = new Room();
+    List<RoomType> roomTypes = new List<RoomType>();
+    RoomType roomTypeModel = new RoomType();
     bool wasSubmitted;
     List<string> imgSrc = new List<string>();
     IFileListEntry file = null;
@@ -223,8 +215,8 @@
 
     protected override void OnInitialized()
     {
-        roomModel = Mongo.GetRoom((int)servise.room.Number);
-        FileSystemService.GetRoomWithPhotos(roomModel);
+        roomTypeModel = Mongo.GetRoomType(servise.room.Type);
+        FileSystemService.GetRoomWithPhotos(roomTypeModel);
     }
 
     public void Submit()
@@ -236,8 +228,9 @@
 
     private void Edit()
     {
-        Mongo.ReplaceRoom((int)servise.room.Number, roomModel);
-        FileSystemService.GetRoomWithPhotos(roomModel);
+        Mongo.ReplaceRoomType(servise.room.Type, roomTypeModel);
+        FileSystemService.GetRoomWithPhotos(roomTypeModel);
+        servise.room = Mongo.GetRoomType(roomTypeModel.Type);
     }
 
     private async Task LoadFiles(IFileListEntry[] files)
@@ -265,8 +258,8 @@
 
     private void Clear()
     {
-        roomModel = Mongo.GetRoom((int)servise.room.Number);
-        FileSystemService.GetRoomWithPhotos(roomModel);
+        roomTypeModel = Mongo.GetRoomType(servise.room.Type);
+        FileSystemService.GetRoomWithPhotos(roomTypeModel);
         imgSrc.Clear();
     }
 }
@@ -278,6 +271,7 @@
 
     .ServicesBlock {
         font-size: 15.5px;
+
         width: 80%;
         margin-left: 16%;
         display: flex;

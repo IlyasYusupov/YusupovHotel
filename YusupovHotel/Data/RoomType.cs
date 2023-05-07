@@ -5,18 +5,17 @@ using YusupovHotel.Shared;
 
 namespace YusupovHotel.Data
 {
-    public class Room
+    public class RoomType
     {
-        public Room(int number, string type, int capacity, double area, int cost, string description)
+        public RoomType(string type, int capacity, double area, int cost, string description)
         {
-            Number = number;
             Type = type;
             Capacity = capacity;
             Area = area;
             Cost = cost;
             Description = description;
         }
-        public Room()
+        public RoomType()
         {
         }
 
@@ -24,10 +23,6 @@ namespace YusupovHotel.Data
         [BsonId]
         [BsonIgnoreIfDefault]
         ObjectId _id;
-
-        [Required(ErrorMessage = "Укажите номер комнаты")]
-        [InputNumberValidation(ErrorMessage = "Такой номер уже зарегистрирован")]
-        public int? Number { get; set; }
 
         [Required(ErrorMessage = "Выберите тип номера")]
         public string Type { get; set; }

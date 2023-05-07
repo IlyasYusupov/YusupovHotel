@@ -18,5 +18,11 @@ function CloseModal() {
     modalInstance.hide();
 }
 
+function CloseModalForm() {
+    var modalAddRoom = document.getElementById('formAddRoom');
+    var modalRoomInstance = bootstrap.Modal.getInstance(modalAddRoom);
+    modalRoomInstance.hide();
+}
+
 
 

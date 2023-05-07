@@ -51,9 +51,9 @@
                                 class="dropdown" style="outline:none; outline-style:none">
                                 <option selected disabled></option>
                                 <option value="Стандарт">Стандарт</option>
+                                <option value="Стандарт плюс">Стандарт плюс</option>
                                 <option value="Бизнес">Бизнес</option>
-                                <option value="Люкс одноместный">Люкс одноместный</option>
-                                <option value="Люкс однокомнатный">Люкс двухкомнатный</option>
+                                <option value="Люкс">Люкс</option>
                                 <option value="Люкс премиум">Люкс премиум</option>
                                 </InputSelect>
                                 <span id="span">Тип номера</span>
@@ -76,7 +76,7 @@
                                     {
                                         @foreach (var room in sortingRooms)
                                         {
-                                            <option value="@room.Number.ToString()">@room.Number</option>
+                                            <option value="@room.RoomNumber.ToString()">@room.RoomNumber</option>
                                         }
                                     }
                                 </InputSelect>
@@ -116,7 +116,7 @@
                 @if (book.DepartureDate < GetDate(DateTime.Now.Date.ToString("dd,MM,yyyy")))
                 {
                     <tr style="background-color: lightgray">
-                        <td>@book.Room.Number</td>
+                        <td>@book.Room.RoomNumber</td>
                         <td>@book.Client.ClientName</td>
                         <td>@book.ArrivalDate</td>
                         <td>@book.DepartureDate</td>
@@ -129,7 +129,7 @@
                 else
                 {
                     <tr>
-                        <td>@book.Room.Number</td>
+                        <td>@book.Room.RoomNumber</td>
                         <td>@book.Client.ClientName</td>
                         <td>@book.ArrivalDate</td>
                         <td>@book.DepartureDate</td>
@@ -147,8 +147,8 @@
 @code {
     List<Booking> bookings = new List<Booking>();
     List<Booking> sortingBookings = new List<Booking>();
-    List<Room> rooms = new List<Room>();
-    List<Room> sortingRooms = new List<Room>();
+    List<Rooms> rooms = new List<Rooms>();
+    List<Rooms> sortingRooms = new List<Rooms>();
     List<Client> clients = new List<Client>();
     List<Client> sortingClients = new List<Client>();
     Booking bookModel = new Booking();
@@ -174,7 +174,7 @@
         sortingBookings = bookings;
         clients = Mongo.FindAllClient();
         sortingClients = clients;
-        rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRooms(), bookings);
+        rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRoom(), bookings);
         sortingRooms = rooms;
     }
 
@@ -189,8 +189,8 @@
         var room = Mongo.GetRoom(int.Parse(roomNumber));
         var arrivalDate = GetDate(chekInDate.ToString().Split(" ")[0]);
         var departureDate = GetDate(chekOutDate.ToString().Split(" ")[0]);
-        var price = TotalPriceCalculate(arrivalDate.ToDateTime(TimeOnly.MinValue), departureDate.ToDateTime(TimeOnly.MinValue), (double)room.Cost);
-        var newBook = new Booking(room, client, int.Parse(adaltCount), int.Parse(childCount), arrivalDate, departureDate, price);
+        var totalPrice = TotalPriceCalculate(arrivalDate.ToDateTime(TimeOnly.MinValue), departureDate.ToDateTime(TimeOnly.MinValue), (double)(Mongo.GetRoomType(room.RoomType).Cost));
+        var newBook = new Booking(room, client, int.Parse(adaltCount), int.Parse(childCount), arrivalDate, departureDate, totalPrice);
         Mongo.AddBookingToDB(newBook);
         bookings.Insert(0, newBook);
         ClaerBookingForm();
@@ -213,7 +213,7 @@
 
     private void OpenPastBooking(Booking booking)
     {
-        servise.booking = booking;
+        servise.booking = Mongo.FindBooking(booking.Client, GetDate(chekInDate.ToString().Split(" ")[0]), GetDate(chekOutDate.ToString().Split(" ")[0]));
         manager.NavigateTo("bookingForCheck");
     }
 

@@ -6,7 +6,7 @@ namespace YusupovHotel.Data
 {
     public class Booking
     {
-        public Booking(Room room, Client client, int adaltCount, int childCount, DateOnly arrivalDate, DateOnly departureDate, double totalPrice)
+        public Booking(Rooms room, Client client, int adaltCount, int childCount, DateOnly arrivalDate, DateOnly departureDate, double totalPrice)
         {
             Room = room;
             Client = client;
@@ -24,7 +24,7 @@ namespace YusupovHotel.Data
         ObjectId _id;
 
 
-        public Room Room { get; set; }
+        public Rooms Room { get; set; }
 
         public Client Client { get; set; }
 

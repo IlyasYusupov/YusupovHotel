@@ -3,21 +3,21 @@ namespace YusupovHotel.Data
 {
     public static class SorterClass
     {
-        public static List<Room> GetRoomWithSelectType(List<Room> newSortingRooms, ref bool isRoomTypeSortON, string roomType)
+        public static List<Rooms> GetRoomWithSelectType(List<Rooms> newSortingRooms, ref bool isRoomTypeSortON, string roomType)
         {
             isRoomTypeSortON = true;
             var sortingRooms = newSortingRooms.Where((element) =>
-                element.Type.ToLower().Contains(roomType.ToLower()))
+                element.RoomType.ToLower().Contains(roomType.ToLower()))
             .ToList();
             return sortingRooms;
         }
 
-        public static List<Room> GetRoomWithoutBooking(List<Room> newSortingRooms, List<Booking> bookings)
+        public static List<Rooms> GetRoomWithoutBooking(List<Rooms> newSortingRooms, List<Booking> bookings)
         {
-            List<Room> list = new();
+            List<Rooms> list = new();
             foreach (var room in newSortingRooms)
             {
-                var temp = bookings.FirstOrDefault((element) => element.Room.Number == room.Number);
+                var temp = bookings.FirstOrDefault((element) => element.Room.RoomNumber == room.RoomNumber);
                 if (temp != null)
                 {
                     if (temp.DepartureDate < GetDate(DateTime.Now.Date.ToString("dd.MM.yyyy")))
@@ -30,17 +30,22 @@ namespace YusupovHotel.Data
             return list;
         }
 
-        public static List<Room> GetRoomForPeopleCount(List<Room> newSortingRooms, ref bool isClientCountSortON, string adaltCount, string childCount)
+        public static List<Rooms> GetRoomForPeopleCount(List<Rooms> newSortingRooms, ref bool isClientCountSortON, string adaltCount, string childCount)
         {
             isClientCountSortON = true;
             int adaltCnt = 0;
             int childCnt = 0;
             if (adaltCount != "") adaltCnt = int.Parse(adaltCount);
             if (childCount != "") childCnt = int.Parse(childCount);
-            var sortingRooms = newSortingRooms.Where((element) =>
-                        element.Capacity >= adaltCnt + childCnt)
-            .ToList();
-            return sortingRooms;
+            var sortingRooms = new List<Rooms>();
+            foreach (var i in newSortingRooms)
+            {
+                sortingRooms = newSortingRooms.Where((element) => 
+                    Mongo.GetRoomType(element.RoomType).Capacity >= adaltCnt + childCnt)
+                    .ToList();
+            }
+
+            return sortingRooms; 
         }
 
         private static DateOnly GetDate(string date)

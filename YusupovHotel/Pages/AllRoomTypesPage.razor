@@ -13,25 +13,17 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold">Добавление нового номера</h4>
+                <h4 class="modal-title w-100 font-weight-bold">Добавление нового типа номера</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick=Clear>
                 </button>
             </div>
-             <EditForm Model="@roomModel" class="formRegistr" OnValidSubmit="@Submit">
+             <EditForm Model="@roomTypeModel" class="formRegistr" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
         <div class="modal-body mx-3">
                 <div class="md-form mb-5">
-                        <iconify-icon icon="tabler:number"></iconify-icon>
-                    <div id="inputBox">
-                        <InputNumber TValue="int?" class="fas fa-envelope prefix grey-text" required="required" @bind-Value="roomModel.Number" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
-                        <span id="span">Номер комнаты</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Number" /></span>
-                    </div>
-                </div>
-                <div class="md-form mb-5">
                         <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
                         <div class="typeList" >
-                        <InputSelect @bind-Value="@roomModel.Type" required="required"
+                        <InputSelect @bind-Value="@roomTypeModel.Type" required="required"
                             class="dropdown" style="outline:none; outline-style:none">
                             <option selected disabled></option>
                             <option value="Стандарт">Стандарт</option>
@@ -41,38 +33,38 @@
                             <option value="Люкс премиум">Люкс премиум</option>
                         </InputSelect>
                         <span id="span">Тип номера</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Type" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Type" /></span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
                     <iconify-icon icon="pepicons-pop:persons"></iconify-icon>
                     <div id="inputBox">
-                        <InputNumber TValue="int?" class="fas fa-envelope prefix grey-text" required="required" @bind-Value="roomModel.Capacity" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
+                        <InputNumber TValue="int?" class="fas fa-envelope prefix grey-text" required="required" @bind-Value="roomTypeModel.Capacity" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')" />
                         <span id="span">Вместимость</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Capacity" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Capacity" /></span>
                     </div>
                 </div>
                 <div class="md-form mb-5">
                         <iconify-icon icon="bx:area"></iconify-icon>
                     <div id="inputBox">
-                        <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomModel.Area"  />
+                        <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomTypeModel.Area"  />
                         <span id="span">Площадь</span>
-                        <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Area" /></span>
+                        <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Area" /></span>
                     </div>
                 </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="ic:twotone-price-check"></iconify-icon>
                         <div id="inputBox">
-                            <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomModel.Cost" />
+                            <InputNumber TValue="double?" class="fas fa-envelope prefix grey-text" required="required" prefix="" @bind-Value="roomTypeModel.Cost" />
                             <span id="span">Цена за ночь</span>
-                            <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.Cost" /></span>
+                            <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Cost" /></span>
                         </div>
                     </div>
                     <div class="md-form mb-5">
                         <iconify-icon icon="mdi:text-box"></iconify-icon>
                         <div id="inputBox">
                             <div class="description">
-                                <InputTextArea class="fas fa-envelope prefix grey-text" style="font-size: 14px;" type="text" @bind-Value="roomModel.Description" required="required" rows="4" />
+                                <InputTextArea class="fas fa-envelope prefix grey-text" style="font-size: 14px;" type="text" @bind-Value="roomTypeModel.Description" required="required" rows="4" />
                                 <span id="span" style="margin-top: -105px; background-color: white">Описание</span>
                             </div>
                         </div>
@@ -102,16 +94,63 @@
         </div>
     </div>
 </div>
+    <div class="modal fade" id="formAddRoom" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Добавление нового номера</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="() => Clear()">
+                    </button>
+                </div>
+                <EditForm Model="@roomModel" class="formRegistr" OnValidSubmit="@SubmitRoom">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-5">
+                            <iconify-icon icon="material-symbols:person"></iconify-icon>
+                            <div id="inputBox">
+                                <InputNumber class="fas fa-envelope prefix grey-text" type="text" @bind-Value=roomModel.RoomNumber required="required" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')"></InputNumber>
+                                <span id="span">Номер комнаты</span>
+                                <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.RoomNumber" /></span>
+                            </div>
+                        </div>
+                        <div class="md-form mb-5">
+                            <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
+                            <div class="typeList">
+                                <InputSelect @bind-Value="@roomModel.RoomType" required="required"
+                                             class="dropdown" style="outline:none; outline-style:none">
+                                    <option selected disabled></option>
+                                    <option value="Стандарт">Стандарт</option>
+                                    <option value="Бизнес">Бизнес</option>
+                                    <option value="Люкс одноместный">Люкс одноместный</option>
+                                    <option value="Люкс однокомнатный">Люкс двухкомнатный</option>
+                                    <option value="Люкс премиум">Люкс премиум</option>
+                                </InputSelect>
+                                <span id="span">Тип номера</span>
+                                <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.RoomType" /></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button class="btn btn-default btn-success" type="submit">Добавить</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
     <div style="text-align: center; font-family: Georgia; font-size: 2em;">
         <span>Номера для проживания</span>
         <button id="buttonAdd" class="button" data-bs-toggle="modal" data-bs-target="#modalRegisterForm">
             <iconify-icon icon="material-symbols:add"></iconify-icon>
         </button>
+        <button id="buttonAdd" class="button" data-bs-toggle="modal" data-bs-target="#formAddRoom">
+            <iconify-icon icon="material-symbols:add"></iconify-icon>
+        </button>
     </div>
     <div class="grid" style="left:-100px; padding: 50px 50px 50px 50px;">
-        @if(rooms.Count != 0)
+        @if(roomTypes.Count != 0)
         {
-            @foreach(var room in rooms)
+            @foreach(var room in roomTypes)
             {
             <div class="grid-item">
                 <a href="room" @onclick="()=> OpenCurentRoom(room)">
@@ -119,7 +158,7 @@
                 </a>
                 <span style="font-size: 28px; top: 69%;">@room.Type</span>
                 <span style="font-size: 18px; top: 78%;">Цена: @room.Cost р</span>
-                <button class="btn" @onClick >Забронировать</button>
+                <button class="btn"  >Забронировать</button>
             </div>
             }
         }
@@ -129,9 +168,11 @@
 
 @code
 {
-    List<Room> rooms = new List<Room>();
-    Room roomModel = new Room();
+    Rooms roomModel = new Rooms();
+    List<RoomType> roomTypes = new List<RoomType>();
+    RoomType roomTypeModel = new RoomType();
     bool wasSubmitted;
+    bool wasSubmittedRoom;
     List<string> imgSrc = new List<string>();
     IFileListEntry file = null;
     List<byte[]> fileBytes = new List<byte[]>();
@@ -139,28 +180,40 @@
 
     protected override async void OnInitialized()
     {
-        rooms = Mongo.GetAllRooms();
-        foreach (var room in rooms)
+        roomTypes = Mongo.GetAllRoomTypes();
+        foreach (var room in roomTypes)
         {
             FileSystemService.GetRoomWithPhotos(room);
         }
     }
 
+    private void AddNewRoomType()
+    {
+        roomTypes.Add(FileSystemService.SaveRoomWithPhotos(fileBytes, roomTypeModel));
+        Clear();
+    }
+
     private void AddNewRoom()
     {
-        rooms.Add(FileSystemService.SaveRoomWithPhotos(fileBytes, roomModel));
+        Mongo.AddRoomToDB(roomModel);
         Clear();
     }
 
     public void Submit()
     {
         wasSubmitted = true;
-        AddNewRoom();
+        AddNewRoomType();
         js.InvokeVoidAsync("CloseModal");
     }
 
+    public void SubmitRoom()
+    {
+        wasSubmittedRoom = true;
+        AddNewRoom();
+        js.InvokeVoidAsync("CloseModalForm");
+    }
 
-    private void OpenCurentRoom(Room room)
+    private void OpenCurentRoom(RoomType room)
     {
         servise.room = room;
     }
@@ -190,7 +243,8 @@
 
     private void Clear()
     {
-        roomModel = new Room();
+        roomTypeModel = new RoomType();
+        roomModel = new Rooms();
         imgSrc.Clear();
     }
 }

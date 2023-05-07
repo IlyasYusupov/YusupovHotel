@@ -66,7 +66,7 @@
     protected override void OnInitialized()
     {
         js.InvokeVoidAsync("ChangePanelsState");
-        client = servise.client;
+        client = Mongo.FindClient(servise.client.Email);
     }
 
     public void Submit()
@@ -86,6 +86,8 @@
             case "Сохранить":
                 disabled = true;
                 btnText = "Изменить";
+                Mongo.ReplaceClient(servise.client.Email, client);
+                servise.client = Mongo.FindClient(client.Email);
                 break;
         }
     }

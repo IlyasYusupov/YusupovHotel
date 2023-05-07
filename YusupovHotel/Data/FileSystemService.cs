@@ -5,15 +5,15 @@ namespace YusupovHotel.Data
 {
     static public class FileSystemService
     {
-        public static Room SaveRoomWithPhotos(List<byte[]> fileBytes, Room room)
+        public static RoomType SaveRoomWithPhotos(List<byte[]> fileBytes, RoomType room)
         {
             room.photos = fileBytes;
-            Mongo.AddRoomToDB(room);
+            Mongo.AddRoomTypeToDB(room);
             GetRoomWithPhotos(room);
             return room;
         }
 
-        public static Room GetRoomWithPhotos(Room room)
+        public static RoomType GetRoomWithPhotos(RoomType room)
         {
             var newRoom = room;
             newRoom.photosUrl = new();

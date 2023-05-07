@@ -89,7 +89,7 @@
                         {
                             @foreach (var room in sortingRooms)
                             {
-                                <option value="@room.Number">@room.Number</option>
+                                <option value="@room.RoomNumber">@room.RoomNumber</option>
                             }
                         }
                     </InputSelect>
@@ -128,8 +128,8 @@
     Client? client;
     List<Booking> bookings = new List<Booking>();
     List<Booking> sortingBookings = new List<Booking>();
-    List<Room> rooms = new List<Room>();
-    List<Room> sortingRooms = new List<Room>();
+    List<Rooms> rooms = new List<Rooms>();
+    List<Rooms> sortingRooms = new List<Rooms>();
     List<Client> clients = new List<Client>();
     List<Client> sortingClients = new List<Client>();
     bool isRoomTypeSortON = true;
@@ -148,19 +148,19 @@
 
     protected override async void OnInitialized()
     {
-        booking = Mongo.FindBooking(servise.booking.Client);
+        booking = Mongo.FindBooking(servise.booking.Client, servise.booking.ArrivalDate, servise.booking.DepartureDate);
         chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
         chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
         bookingModel = servise.booking;
-        roomNumber = (int)bookingModel.Room.Number;
+        roomNumber = (int)bookingModel.Room.RoomNumber;
         clients = Mongo.FindAllClient();
         sortingClients = clients;
-        rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRooms(), bookings);
+        rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRoom(), bookings);
         sortingRooms = rooms;
         nameClient = booking.Client.ClientName;
         adaltCount = booking.AdaltCount.ToString();
         childCount = booking.ChildCount.ToString();
-        roomType = booking.Room.Type;
+        roomType = booking.Room.RoomType;
         Sorter("roomType");
     }
 
@@ -171,7 +171,7 @@
         int year = int.Parse(date.Split('.', ',')[2]);
         return new DateOnly(year, mounth, day);
     }
-    
+
     private void TotalPriceCalculate()
     {
         if (roomNumber != 0)
@@ -179,7 +179,8 @@
             var arrivalDate = (GetDate(chekInDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
             var departureDate = (GetDate(chekOutDate.ToString().Split(" ")[0])).ToDateTime(TimeOnly.MinValue);
             var room = Mongo.GetRoom(roomNumber);
-            bookingModel.TotalPrice = (double)room.Cost * ((int)(departureDate - arrivalDate).TotalDays);
+            var price = Mongo.GetRoomType(room.RoomType).Cost;
+            bookingModel.TotalPrice = price * ((int)(departureDate - arrivalDate).TotalDays);
             
         }
     }
@@ -191,14 +192,12 @@
         {
             case "Изменить":
                 disabled = false;
-
                 btnText = "Сохранить";
                 break;
             case "Сохранить":
                 disabled = true;
                 btnText = "Изменить";
-                var newBooking = new Booking();
-                Mongo.ReplaceBooking(bookingModel.Client, booking);
+                Mongo.ReplaceBooking(bookingModel.Client, bookingModel.ArrivalDate, bookingModel.DepartureDate, bookingModel);
                 break;
         }
         roomNumber = new int();
@@ -256,8 +255,8 @@
         btnText = "Изменить";
         bookingModel = booking;
         nameClient = booking.Client.ClientName;
-        roomNumber = (int)booking.Room.Number;
-        roomType = booking.Room.Type;
+        roomNumber = (int)booking.Room.RoomNumber;
+        roomType = booking.Room.RoomType;
         chekInDate = GetDate(booking.ArrivalDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
         chekOutDate = GetDate(booking.DepartureDate.ToString("dd,MM,yyyy")).ToDateTime(TimeOnly.MinValue);
     }
