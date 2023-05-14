@@ -26,7 +26,7 @@
         //    this.client = client;
         //}
 
-        public RoomType room { get; set; }
+        public RoomType roomType { get; set; }
 
         //public Room GetRoom()
         //{

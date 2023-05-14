@@ -1,0 +1,320 @@
+﻿@page "/rooms"
+
+<PageTitle>Clients</PageTitle>
+
+@inject IJSRuntime js
+@inject NavigationManager manager
+@inject SingletonServise servise
+
+<section>
+    <div class="modal fade" id="formAddRoom" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Добавление нового номера</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="() => Clear()">
+                    </button>
+                </div>
+                <EditForm Model="@roomModel" class="formRegistr" OnValidSubmit="@SubmitRoom">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-5">
+                            <iconify-icon icon="material-symbols:person"></iconify-icon>
+                            <div id="inputBox">
+                                <InputNumber class="fas fa-envelope prefix grey-text" type="text" @bind-Value=roomModel.RoomNumber required="required" onkeyup="this.value = this.value.replace(/[^0-9]/ig, '')"></InputNumber>
+                                <span id="span">Номер комнаты</span>
+                                <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.RoomNumber" /></span>
+                            </div>
+                        </div>
+                        <div class="md-form mb-5">
+                            <iconify-icon icon="icon-park-twotone:hotel-please-clean"></iconify-icon>
+                            <div class="typeList">
+                                <InputSelect @bind-Value="@roomModel.RoomType" required="required"
+                                             class="dropdown" style="outline:none; outline-style:none">
+                                    <option selected disabled></option>
+                                    @if (types.Count > 0)
+                                    {
+                                        foreach (var i in types)
+                                        {
+                                            <option value="@i.Type">@i.Type</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <span id="span">Тип номера</span>
+                                <span style="margin-top: -4px"><ValidationMessage For="() => roomModel.RoomType" /></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button class="btn btn-default btn-success" type="submit">Добавить</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+<div  class="appbar"  style="margin: 20px 0 0 10%">
+        <input id="searching" class="sort" type="text" @bind="search" @bind:event="oninput" @onkeyup="Searching" required="required" placeholder="Поиск">
+    <i id="searching" class="fas fa-search prefix grey-text"></i>
+    <button id="newClient" class="btn btn-default btn-success" data-bs-toggle="modal" @onclick="Clear" data-bs-target="#formAddRoom">
+    Добавить новый номер
+</button>
+</div>
+    <table class="table" style="overflow-y:auto; width: 80%; margin: 40px 10%; ">
+        <thead >
+            <tr>
+                <th>Номер комнаты</th>
+                <th>Тип номера</th>
+                <th>Редактировать</th>
+                <th>Подробнее</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var room in sortingRooms)
+            {
+                <tr >
+                    <td>@room.RoomNumber</td>
+                    <td>@room.RoomType</td>
+                    <td>
+                        <button class="button" style="vertical-align:middle" data-bs-toggle="modal" data-bs-target="#formAddRoom" @onclick="() => EditRoom(room)"><span>Изменить </span></button>
+                    </td>
+                    <td>
+                        <button class="button1" style="vertical-align:middle" @onclick="() => OpenCurentRoom(room)"><span>Подробнее </span></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>
+@code
+{
+    Rooms roomModel = new Rooms();
+    List<Rooms> rooms = new List<Rooms>();
+    List<Rooms> sortingRooms = new List<Rooms>();
+    List<RoomType> types = new List<RoomType>();
+    string search = "";
+
+    protected override void OnInitialized()
+    {
+        js.InvokeVoidAsync("ChangePanelsState");
+        rooms = Mongo.GetAllRoom();
+        sortingRooms = rooms;
+        types = Mongo.GetAllRoomTypes();
+    }
+
+    public void EditRoom(Rooms room)
+    {
+        roomModel = room;
+    }
+
+    public void OpenCurentRoom(Rooms room)
+    {
+        servise.roomType = Mongo.GetRoomType(room.RoomType);
+        manager.NavigateTo("roomType");
+    }
+
+    private void AddNewRoom()
+    {
+        Mongo.AddRoomToDB(roomModel);
+        rooms.Add(roomModel);
+        Searching();
+        Clear();
+    }
+
+    public void SubmitRoom()
+    {
+        AddNewRoom();
+        js.InvokeVoidAsync("CloseModalForm");
+    }
+
+    private void Searching()
+    {
+        sortingRooms = SearcherClass.SearchingRooms(rooms, search);
+    }
+
+    private void Clear()
+    {
+        roomModel = new Rooms();
+    }
+}
+
+
+<style>
+    body {
+        background-color: #eeeeee
+    }
+
+    .appbar{
+        margin-bottom: 20px;
+    }
+
+    #newClient {
+        margin-left: 250px;
+        margin-top: -1px;
+    }
+
+    #searching { 
+        width: 250px;
+        height: 35px;
+        padding-left: 24px;
+        
+    }
+    
+    .typeList select {
+        background: transparent;
+        outline: none;
+        font-size: 16px;
+        border: 0;
+        border-radius: 0px;
+        border-bottom: 1px solid #ced4da;
+        height: 35px;
+        width: 400px;
+        margin-left: 2.6rem;
+    }
+
+    #searching ~ i {
+        width: 35px;
+        margin-left: -272px;
+    }
+
+    #inputBox {
+        position: relative;
+        margin-top: -40px;
+    }
+
+    .typeList, .description {
+        position: relative;
+        margin-top: -33px;
+    }
+
+    #span {
+        margin-top: -30px;
+    }
+
+    #inputimage {
+        position: relative;
+        margin-top: -55px;
+        outline: none;
+        margin-left: 2.6rem;
+        height: 37px;
+        width: 400px;
+    }
+
+    #inputBox input {
+        background-color: transparent;
+        border: 0;
+        border-bottom: 1px solid #ced4da;
+        border-radius: 0;
+        outline: none;
+        color: black;
+        font-size: 14px;
+        margin-left: 2.6rem;
+        height: 37px;
+        width: 400px;
+    }
+
+    #inputBox span, .typeList span, .description span {
+        position: absolute;
+        left: 45px;
+        padding: 4px;
+        pointer-events: none;
+        font-size: 0.8em;
+        color: gray;
+        text-transform: uppercase;
+        transition: 0.5s;
+    }
+
+    .description textarea:active,
+    .typeList select:active {
+        border-color: #ced4da;
+        outline: none;
+    }
+
+    .description textarea:valid ~ #span,
+    .description textarea:focus ~ #span,
+    .typeList select:valid ~ #span,
+    .typeList select:focus ~ #span,
+    #inputBox input:valid ~ #span,
+    #inputBox input:focus ~ #span {
+        color: grey;
+        transform: translateX(-1px) translateY(-15px);
+        font-size: 0.6em;
+        background: none;
+        letter-spacing: 0.2em;
+    }
+
+    .md-form .prefix ~ input, select, textarea {
+        width: calc(100% - 2rem);
+        margin-left: 2.5rem;
+    }
+
+    .md-form iconify-icon {
+        position: relative;
+        transition: color .2s;
+        font-size: 2.1rem;
+        top: 5px;
+    }
+
+    .button, .button1 {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #0dcaf0;
+        border: none;
+        color: black;
+        text-align: center;
+        font-size: 16px;
+        padding: 11px;
+        width: 116px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+        .button span, .button1 span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+            .button span:after {
+                content: '\00bb';
+                position: absolute;
+                opacity: 0;
+                top: 0;
+                right: -30px;
+                transition: 0.5s;
+            }
+
+        .button:hover span {
+            padding-right: 22px;
+        }
+
+            .button:hover span:after {
+                opacity: 1;
+                right: 0;
+            }
+
+        .button1 span:after {
+            content: '\00bb';
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            right: -30px;
+            transition: 0.5s;
+        }
+
+        .button1:hover span {
+            padding-right: 20px;
+        }
+
+            .button1:hover span:after {
+                opacity: 1;
+                right: 0;
+            }
+
+</style>
+
+
+
+    

@@ -1,4 +1,4 @@
-﻿@page "/room"
+﻿@page "/roomType"
 
 <PageTitle>Profile</PageTitle>
 @inject IJSRuntime js
@@ -24,11 +24,13 @@
                         <InputSelect @bind-Value="@roomTypeModel.Type" required="required"
                             class="dropdown" style="outline:none; outline-style:none">
                             <option selected disabled></option>
-                            <option value="Стандарт">Стандарт</option>
-                            <option value="Бизнес">Бизнес</option>
-                            <option value="Люкс одноместный">Люкс одноместный</option>
-                            <option value="Люкс однокомнатный">Люкс двухкомнатный</option>
-                            <option value="Люкс премиум">Люкс премиум</option>
+                            @if (types.Count > 0)
+                            {
+                                foreach (var i in types)
+                                {
+                                    <option value="@i.Type">@i.Type</option>
+                                }
+                            }       
                         </InputSelect>
                         <span id="span">Тип номера</span>
                         <span style="margin-top: -4px"><ValidationMessage For="() => roomTypeModel.Type" /></span>
@@ -137,61 +139,335 @@
     <div class="Caption" >
         <span>Оснащение номера</span>
     </div>
-    <div class="ServicesBlock">
-        <div style="width: 30%; ">
-            <div class="Services">
-                <iconify-icon icon="material-symbols:bed-outline"></iconify-icon>
-                King-size bed или 2 одноместные 
-                кровати размером 100*200 см
-            </div>
-            <div class="Services">
-                <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
-                Звукоизолированный номер
-            </div>
-            <div class="Services">
-                <iconify-icon icon="ic:outline-live-tv"></iconify-icon>
-                Спутниковое телевидение
-            </div>
-            <div class="Services">
-                <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
-                Высокоскоростной беспроводной интернет
-            </div>
-            <div class="Services">
-                <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
-                Просторный рабочий стол
-            </div>
-            <div class="Services">
-                <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
-                Мини-бар
-            </div>
+    @if(roomTypeModel.Type == "Бизнес")
+        {  
+        <div class="ServicesBlock">
+    <div style="width: 30%; ">
+        <div class="Services">
+            <iconify-icon icon="material-symbols:bed-outline"></iconify-icon>
+            King-size bed или 2 одноместные 
+            кровати размером 100*200 см
         </div>
-        <div style="width: 35%; padding-left: 45px;">
-            <div class="Services">
-                <iconify-icon icon="bi:safe"></iconify-icon>
-                Сейф
-            </div>
-            <div class="Services">
-                <iconify-icon icon="game-icons:slippers"></iconify-icon>
-                Халат, тапочки
-            </div>
-            <div class="Services">
-                <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
-                Фен, мыло, шампунь, гель для душа
-            </div>
-            <div class="Services">
-                <iconify-icon icon="tabler:teapot"></iconify-icon>
-                Чайная станция
-            </div>
-            <div class="Services">
-                <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
-                Набор для приготовления чая/кофе
-            </div>
-            <div class="Services">
-                <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
-                Просторная ванная комната с подогреваемым полом
-            </div>
+        <div class="Services">
+            <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+            Звукоизолированный номер
         </div>
+        <div class="Services">
+            <iconify-icon icon="ic:outline-live-tv"></iconify-icon>
+            Спутниковое телевидение
         </div>
+        <div class="Services">
+            <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+            Высокоскоростной беспроводной интернет
+        </div>
+        <div class="Services">
+            <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+            Просторный рабочий стол
+        </div>
+        <div class="Services">
+            <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+            Мини-бар
+        </div>
+    </div>
+    <div style="width: 35%; padding-left: 45px;">
+        <div class="Services">
+            <iconify-icon icon="bi:safe"></iconify-icon>
+            Сейф
+        </div>
+        <div class="Services">
+            <iconify-icon icon="game-icons:slippers"></iconify-icon>
+            Халат, тапочки
+        </div>
+        <div class="Services">
+            <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+            Фен, мыло, шампунь, гель для душа
+        </div>
+        <div class="Services">
+            <iconify-icon icon="tabler:teapot"></iconify-icon>
+            Чайная станция
+        </div>
+        <div class="Services">
+            <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+            Набор для приготовления чая/кофе
+        </div>
+        <div class="Services">
+            <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+            Ванная комната с подогреваемым полом
+        </div>
+    </div>
+            </div>
+        }
+        else if (roomTypeModel.Type == "Стандарт")
+        {
+                <div class="ServicesBlock">
+                    <div style="width: 30%; ">
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+                            Звукоизолированный номер
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+                            Бесплатный WI-FI интернет
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+                            Просторный рабочий стол
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+                            Мини-бар
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="bi:safe"></iconify-icon>
+                            Сейф
+                        </div>
+                    </div>
+                    <div style="width: 35%; padding-left: 45px;">
+                      
+                        <div class="Services">
+                            <iconify-icon icon="game-icons:slippers"></iconify-icon>
+                            Халат, тапочки
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+                            Фен, мыло, шампунь, гель для душа
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="tabler:teapot"></iconify-icon>
+                            Чайная станция
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+                            Набор для приготовления чая/кофе
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+                            Ванная комната с подогреваемым полом
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (roomTypeModel.Type == "Стандарт плюс")
+            {
+                <div class="ServicesBlock">
+                    <div style="width: 30%; ">
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:bed-outline"></iconify-icon>
+                            2 King-size bed или 4 одноместные
+                            кровати размером 100*200 см
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+                            Звукоизолированный номер
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+                            Бесплатный WI-FI интернет
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+                            Просторный рабочий стол
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+                            Мини-бар
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="bi:safe"></iconify-icon>
+                            Сейф
+                        </div>
+                    </div>
+                    <div style="width: 35%; padding-left: 45px;">
+
+                        <div class="Services">
+                            <iconify-icon icon="game-icons:slippers"></iconify-icon>
+                            Халат, тапочки
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+                            Фен, мыло, шампунь, гель для душа
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="tabler:teapot"></iconify-icon>
+                            Чайная станция
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+                            Набор для приготовления чая/кофе
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+                            Ванная комната с подогреваемым полом
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (roomTypeModel.Type == "Люкс")
+            {
+                <div class="ServicesBlock">
+                    <div style="width: 30%; ">
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:bed-outline"></iconify-icon>
+                            King-size bed или 2 одноместные
+                            кровати размером 100*200 см
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+                            Звукоизолированный номер
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="ic:outline-live-tv"></iconify-icon>
+                            Спутниковое телевидение
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+                            Высокоскоростной беспроводной интернет
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+                            Просторный рабочий стол
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+                            Мини-бар
+                        </div>
+                    </div>
+                    <div style="width: 35%; padding-left: 45px;">
+                        <div class="Services">
+                            <iconify-icon icon="bi:safe"></iconify-icon>
+                            Сейф
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="game-icons:slippers"></iconify-icon>
+                            Халат, тапочки
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+                            Фен, мыло, шампунь, гель для душа
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="tabler:teapot"></iconify-icon>
+                            Чайная станция
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+                            Набор для приготовления чая/кофе
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+                            Просторная ванная комната с подогреваемым полом
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (roomTypeModel.Type == "Люкс премиум")
+            {
+                <div class="ServicesBlock">
+                    <div style="width: 30%; ">
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:bed-outline"></iconify-icon>
+                            2 King-size bed или 2 одноместные
+                            кровати размером 100*200 см
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+                            Звукоизолированный номер
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="ic:outline-live-tv"></iconify-icon>
+                            Спутниковое телевидение
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+                            Высокоскоростной беспроводной интернет
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+                            Просторный рабочий стол
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+                            Мини-бар
+                        </div>
+                    </div>
+                    <div style="width: 35%; padding-left: 45px;">
+                        <div class="Services">
+                            <iconify-icon icon="bi:safe"></iconify-icon>
+                            Сейф
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="game-icons:slippers"></iconify-icon>
+                            Халат, тапочки
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+                            Фен, мыло, шампунь, гель для душа
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="tabler:teapot"></iconify-icon>
+                            Чайная станция
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+                            Набор для приготовления чая/кофе
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+                            Просторная ванная комната с подогреваемым полом
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="ServicesBlock">
+                    <div style="width: 30%; ">
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:volume-off-outline"></iconify-icon>
+                            Звукоизолированный номер
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:wifi-rounded"></iconify-icon>
+                            Бесплатный WI-FI интернет
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:table-lamp-outline-sharp"></iconify-icon>
+                            Просторный рабочий стол
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="material-symbols:local-bar"></iconify-icon>
+                            Мини-бар
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="bi:safe"></iconify-icon>
+                            Сейф
+                        </div>
+                    </div>
+                    <div style="width: 35%; padding-left: 45px;">
+
+                        <div class="Services">
+                            <iconify-icon icon="game-icons:slippers"></iconify-icon>
+                            Халат, тапочки
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="mdi:hair-dryer-outline"></iconify-icon>
+                            Фен, мыло, шампунь, гель для душа
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="tabler:teapot"></iconify-icon>
+                            Чайная станция
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:tea-cup-outline"></iconify-icon>
+                            Набор для приготовления чая/кофе
+                        </div>
+                        <div class="Services">
+                            <iconify-icon icon="solar:bath-line-duotone"></iconify-icon>
+                            Ванная комната с подогреваемым полом
+                        </div>
+                    </div>
+                </div>
+            }
     </div>
 </div>
 <div class="Caption">
@@ -205,7 +481,7 @@
 </section>
 
 @code {
-    List<RoomType> roomTypes = new List<RoomType>();
+    List<RoomType> types = new List<RoomType>();
     RoomType roomTypeModel = new RoomType();
     bool wasSubmitted;
     List<string> imgSrc = new List<string>();
@@ -215,7 +491,8 @@
 
     protected override void OnInitialized()
     {
-        roomTypeModel = Mongo.GetRoomType(servise.room.Type);
+        roomTypeModel = Mongo.GetRoomType(servise.roomType.Type);
+        types = Mongo.GetAllRoomTypes();
         FileSystemService.GetRoomWithPhotos(roomTypeModel);
     }
 
@@ -228,9 +505,9 @@
 
     private void Edit()
     {
-        Mongo.ReplaceRoomType(servise.room.Type, roomTypeModel);
+        Mongo.ReplaceRoomType(servise.roomType.Type, roomTypeModel);
         FileSystemService.GetRoomWithPhotos(roomTypeModel);
-        servise.room = Mongo.GetRoomType(roomTypeModel.Type);
+        servise.roomType = Mongo.GetRoomType(roomTypeModel.Type);
     }
 
     private async Task LoadFiles(IFileListEntry[] files)
@@ -253,12 +530,12 @@
             }
         }
         else if (files.Count() > 3) inputFileError = "Можно загрузить только 3 фото";
-        //else inputFileError = "Нужно загрузить 3 фото";
+        else inputFileError = "Нужно загрузить 3 фото";
     }
 
     private void Clear()
     {
-        roomTypeModel = Mongo.GetRoomType(servise.room.Type);
+        roomTypeModel = Mongo.GetRoomType(servise.roomType.Type);
         FileSystemService.GetRoomWithPhotos(roomTypeModel);
         imgSrc.Clear();
     }

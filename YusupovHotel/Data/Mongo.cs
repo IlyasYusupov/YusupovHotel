@@ -12,6 +12,15 @@ namespace YusupovHotel.Data
             collection.InsertOne(user);
             
         }
+        public static void AddTypeToDB(String tpye)
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("HotelBase");
+            var collection = database.GetCollection<String>("TypesName");
+            collection.InsertOne(tpye);
+
+        }
+
         public static void AddRoomTypeToDB(RoomType room)
         {
             var client = new MongoClient();
@@ -69,6 +78,16 @@ namespace YusupovHotel.Data
             var database = client.GetDatabase("HotelBase");
             var collection = database.GetCollection<User>("Users");
             collection.ReplaceOne(z => z.Email == email, user);
+        }
+
+
+        public static List<string> FindTypes()
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("HotelBase");
+            var collection = database.GetCollection<string>("TypesName");
+            var list = collection.Find(x => true).ToList();
+            return list;
         }
 
         public static RoomType GetRoomType(string type)

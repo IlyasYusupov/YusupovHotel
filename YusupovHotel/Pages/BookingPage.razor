@@ -23,12 +23,12 @@
                         </div>
                         <div class="col-sm-7">
                             <input class="bookingInput" type="text" @bind="nameClient" disabled="@disabled" @bind:event="oninput" @onfocus="OpenClientList" @onkeyup="@(() => Searcher("client"))">
-                            <div class="dropdownClients" style="display:@clientsSearch;">
+                            @*<div class="dropdownClients" style="display:@clientsSearch;">
                                 @foreach (var client in sortingClients)
                                 {
                                     <a @onclick="() => SelectCleint(client)">@client.ClientName</a>
                                 }
-                            </div>
+                            </div>*@
                         </div>
                     </div>
                     <hr>
@@ -58,11 +58,13 @@
                             <InputSelect @bind-Value="roomType"  @onclick="@(() => Sorter("roomType"))" required="required" disabled="@disabled"
                                          class="dropdown" style="outline:none; outline-style:none;font-size: 16px;border: 0;border-radius: 0px;height: 35px;width: 100%;">
                                 <option selected disabled></option>
-                                <option value="Стандарт">Стандарт</option>
-                                <option value="Бизнес">Бизнес</option>
-                                <option value="Люкс одноместный">Люкс одноместный</option>
-                                <option value="Люкс однокомнатный">Люкс двухкомнатный</option>
-                                <option value="Люкс премиум">Люкс премиум</option>
+                                @if (types.Count > 0)
+                                {
+                                    @foreach (var i in types)
+                                    {
+                                        <option value="@i.Type">@i.Type</option>
+                                    }
+                                }
                             </InputSelect>
                                 
                     </div>
@@ -132,12 +134,12 @@
     List<Rooms> sortingRooms = new List<Rooms>();
     List<Client> clients = new List<Client>();
     List<Client> sortingClients = new List<Client>();
+    List<RoomType> types = new List<RoomType>();
     bool isRoomTypeSortON = true;
     bool isClientCountSortON = true;
     string nameClient = "";
     string adaltCount = "";
     string childCount = "";
-    bool wasSubmitted;
     bool disabled = true;
     string btnText = "Изменить";
     string clientsSearch = "none";
@@ -161,6 +163,7 @@
         adaltCount = booking.AdaltCount.ToString();
         childCount = booking.ChildCount.ToString();
         roomType = booking.Room.RoomType;
+        types = Mongo.GetAllRoomTypes();
         Sorter("roomType");
     }
 
@@ -181,10 +184,9 @@
             var room = Mongo.GetRoom(roomNumber);
             var price = Mongo.GetRoomType(room.RoomType).Cost;
             bookingModel.TotalPrice = price * ((int)(departureDate - arrivalDate).TotalDays);
-            
         }
     }
-    
+
 
     public void Editing()
     {
@@ -193,14 +195,18 @@
             case "Изменить":
                 disabled = false;
                 btnText = "Сохранить";
+                roomNumber = 0;
                 break;
             case "Сохранить":
                 disabled = true;
                 btnText = "Изменить";
-                Mongo.ReplaceBooking(bookingModel.Client, bookingModel.ArrivalDate, bookingModel.DepartureDate, bookingModel);
+                Booking newBooking = new Booking(Mongo.GetRoom(roomNumber), bookingModel.Client, int.Parse(adaltCount), int.Parse(childCount), 
+                                                GetDate(chekInDate.ToString().Split(" ")[0]), GetDate(chekOutDate.ToString().Split(" ")[0]), (double)bookingModel.TotalPrice);
+                Mongo.ReplaceBooking(bookingModel.Client, bookingModel.ArrivalDate, bookingModel.DepartureDate, newBooking);
+                servise.booking = Mongo.FindBooking(newBooking.Client, newBooking.ArrivalDate, newBooking.DepartureDate);
+                roomNumber = (int)(servise.booking.Room.RoomNumber);
                 break;
         }
-        roomNumber = new int();
     }
 
     private void OpenClientList()
@@ -263,7 +269,6 @@
 
     public void Submit()
     {
-        wasSubmitted = true;
         Editing();
     }
 }
@@ -286,6 +291,7 @@
         height: 37px;
         font-size: 16px;
         margin-top: -2%;
+        background-color: white;
     }
 
 .section {

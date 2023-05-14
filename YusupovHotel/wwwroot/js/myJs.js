@@ -18,6 +18,12 @@ function CloseModal() {
     modalInstance.hide();
 }
 
+function OpenModal() {
+    document.getElementById('modalRegisterForm').modal('show');
+
+}
+
+
 function CloseModalForm() {
     var modalAddRoom = document.getElementById('formAddRoom');
     var modalRoomInstance = bootstrap.Modal.getInstance(modalAddRoom);

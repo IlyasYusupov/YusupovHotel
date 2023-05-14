@@ -10,7 +10,7 @@ namespace YusupovHotel.Data
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var Value = int.Parse(value.ToString());
-            if (Mongo.GetAllRoom().FirstOrDefault(x => x.RoomNumber == Value) == null || Value == RoomForValidation.room.RoomNumber)
+            if (Mongo.GetAllRoom().FirstOrDefault(x => x.RoomNumber == Value) == null)
                 return null;
             return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
         }

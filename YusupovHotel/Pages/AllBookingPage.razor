@@ -50,11 +50,13 @@
                             <InputSelect @bind-Value="roomType" @onclick="@(() => Sorter("roomType"))" required="required"
                                 class="dropdown" style="outline:none; outline-style:none">
                                 <option selected disabled></option>
-                                <option value="Стандарт">Стандарт</option>
-                                <option value="Стандарт плюс">Стандарт плюс</option>
-                                <option value="Бизнес">Бизнес</option>
-                                <option value="Люкс">Люкс</option>
-                                <option value="Люкс премиум">Люкс премиум</option>
+                                    @if (types.Count > 0)
+                                    {
+                                        @foreach (var i in types)
+                                        {
+                                            <option value="@i.Type">@i.Type</option>
+                                        }                                        
+                                    }
                                 </InputSelect>
                                 <span id="span">Тип номера</span>
                             </div>
@@ -151,6 +153,7 @@
     List<Rooms> sortingRooms = new List<Rooms>();
     List<Client> clients = new List<Client>();
     List<Client> sortingClients = new List<Client>();
+    List<RoomType> types = new List<RoomType>();
     Booking bookModel = new Booking();
     bool isRoomTypeSortON;
     bool isClientCountSortON;
@@ -164,8 +167,6 @@
     string childCount = "";
     string roomNumber = "";
     string roomType = "";
-    bool wasSubmitted;
-
 
     protected override void OnInitialized()
     {
@@ -176,11 +177,11 @@
         sortingClients = clients;
         rooms = SorterClass.GetRoomWithoutBooking(Mongo.GetAllRoom(), bookings);
         sortingRooms = rooms;
+        types = Mongo.GetAllRoomTypes();
     }
 
     public void Submit()
     {
-        wasSubmitted = true;
         AddNewBook();
         js.InvokeVoidAsync("CloseModal");
     }
@@ -213,7 +214,7 @@
 
     private void OpenPastBooking(Booking booking)
     {
-        servise.booking = Mongo.FindBooking(booking.Client, GetDate(chekInDate.ToString().Split(" ")[0]), GetDate(chekOutDate.ToString().Split(" ")[0]));
+        servise.booking = Mongo.FindBooking(booking.Client, GetDate(booking.ArrivalDate.ToString().Split(" ")[0]), GetDate(booking.DepartureDate.ToString().Split(" ")[0]));
         manager.NavigateTo("bookingForCheck");
     }
 
@@ -272,7 +273,6 @@
                 break;
         }
     }
-
 
     private void ClaerBookingForm()
     {

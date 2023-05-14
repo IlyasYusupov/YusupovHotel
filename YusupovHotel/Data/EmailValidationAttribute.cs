@@ -7,7 +7,7 @@ namespace YusupovHotel.Data
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var lowerValue = value.ToString().ToLower();
-            if (Mongo.FindUser(lowerValue) == null && Mongo.FindClient(lowerValue) == null)
+            if (Mongo.FindUser(lowerValue) == null && Mongo.FindClient(lowerValue) == null || lowerValue == ForValidation.Email)
                 return null;
             return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
         }

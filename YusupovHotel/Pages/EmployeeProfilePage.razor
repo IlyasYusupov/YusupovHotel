@@ -64,7 +64,7 @@
                         Отмена
                 </button>
                 <button type="submit"
-                        class="btn btn-success" @onclick=Editing>
+                        class="btn btn-success">
                         @btnText
                 </button>
             </div>
@@ -81,13 +81,13 @@
     string inputFileError = "";
     User? user;
     string btnText = "Изменить";
-    bool wasSubmitted;
     bool disabled = true;
 
     protected override void OnInitialized()
     {
         js.InvokeVoidAsync("ChangePanelsState");
-        user = servise.user;
+        user = Mongo.FindUser(servise.user.Email);
+        ForValidation.Email = user.Email;
         if (user.Photo != null)
         {
             user = FileSystemService.GetUserWithPhoto(user);
@@ -98,7 +98,6 @@
 
     public void Submit()
     {
-        wasSubmitted = true;
         Editing();
     }
 
@@ -109,12 +108,13 @@
             case "Изменить":
                 disabled = false;
                 btnText = "Сохранить";
-                break;
+                return;
             case "Сохранить":
                 disabled = true;
                 btnText = "Изменить";
-                FileSystemService.SaveUserWithPhoto(fileBytes, user);
-                break;
+                if (fileBytes != null)
+                    FileSystemService.SaveUserWithPhoto(fileBytes, user);
+                return;
         }
     }
 
